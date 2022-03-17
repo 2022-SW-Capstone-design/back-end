@@ -8,26 +8,54 @@ const cors = require('cors');
 
 dotenv.config();
 const indexRouter = require('./routes/index');
-// const { sequelize } = require('./models');
+const { sequelize } = require('./models');
 
 const app = express();
 app.set('port', process.env.PORT || 8081); // 임시포트
 
 // app.set('view engine', 'html');
 
-// sequelize.sync({ force: false })
-//     .then(() => {
-//         console.log('데이터베이스 연결 성공');
-//     })
-//     .catch((err) => {
-//         console.error(err);
-//     });
+sequelize.sync({ force: false })
+    .then(() => {
+        console.log('데이터베이스 연결 성공');
+    })
+    .catch((err) => {
+        console.error(err);
+    });
 
 app.use(morgan('dev'));
 app.use(cors());
 app.use(express.static(path.join(__dirname, '../client/myapp/public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+
+// db 테스트용 데이터
+const { User, Novel } = require('./models');
+
+const testFunc = async () => {
+    try {
+    await User.create({
+        userID : "John123",
+        password : "asdf",
+        nickname : "John",
+    }).then(console.log('John created.'));
+    
+    await Novel.create({
+        novelTitle: "Harry Poter",
+        novelIntro: "HELLO",
+        novelGenre: "Fantasy",
+        novelID : 1234,
+        User_userID : "John123",
+    }).then(console.log('novel created'));
+    
+    } catch(err) {
+        console.log(err);
+    }
+}
+testFunc();
+
+
 
 // router 핸들링
 app.use('/', indexRouter);
