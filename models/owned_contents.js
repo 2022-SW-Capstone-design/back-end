@@ -4,11 +4,12 @@ module.exports = function(sequelize, DataTypes) {
     novelID: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      unique: "novelID_UNIQUE"
+      primaryKey: true
     },
     chapterID: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: false,
+      primaryKey: true
     },
     User_userID: {
       type: DataTypes.STRING(45),
@@ -18,6 +19,10 @@ module.exports = function(sequelize, DataTypes) {
         model: 'user',
         key: 'userID'
       }
+    },
+    own: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true
     }
   }, {
     sequelize,
@@ -30,13 +35,7 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "User_userID" },
-        ]
-      },
-      {
-        name: "novelID_UNIQUE",
-        unique: true,
-        using: "BTREE",
-        fields: [
+          { name: "chapterID" },
           { name: "novelID" },
         ]
       },

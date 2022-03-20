@@ -3,15 +3,15 @@ module.exports = function(sequelize, DataTypes) {
   return sequelize.define('novel', {
     novelTitle: {
       type: DataTypes.STRING(45),
-      allowNull: true
+      allowNull: false
     },
-    novelIntro: {
+    novelDescription: {
       type: DataTypes.STRING(45),
-      allowNull: true
+      allowNull: false
     },
     novelGenre: {
       type: DataTypes.STRING(45),
-      allowNull: true
+      allowNull: false
     },
     novelID: {
       type: DataTypes.INTEGER,
@@ -26,6 +26,10 @@ module.exports = function(sequelize, DataTypes) {
         model: 'user',
         key: 'userID'
       }
+    },
+    coverFileName: {
+      type: DataTypes.STRING(45),
+      allowNull: true
     }
   }, {
     sequelize,

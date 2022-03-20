@@ -15,7 +15,7 @@ function initModels(sequelize) {
   novel.belongsTo(user, { as: "User_user", foreignKey: "User_userID"});
   user.hasMany(novel, { as: "novels", foreignKey: "User_userID"});
   owned_contents.belongsTo(user, { as: "User_user", foreignKey: "User_userID"});
-  user.hasOne(owned_contents, { as: "owned_content", foreignKey: "User_userID"});
+  user.hasMany(owned_contents, { as: "owned_contents", foreignKey: "User_userID"});
 
   return {
     chapter,

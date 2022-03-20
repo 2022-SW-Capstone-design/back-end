@@ -6,17 +6,13 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true
     },
-    chapterName: {
+    chapterTitle: {
       type: DataTypes.STRING(45),
-      allowNull: true
+      allowNull: false
     },
     chapterFileName: {
       type: DataTypes.STRING(45),
-      allowNull: true
-    },
-    Chaptercol: {
-      type: DataTypes.STRING(45),
-      allowNull: true
+      allowNull: false
     },
     Novel_novelID: {
       type: DataTypes.INTEGER,
@@ -39,14 +35,6 @@ module.exports = function(sequelize, DataTypes) {
         fields: [
           { name: "chapterID" },
           { name: "Novel_novelID" },
-        ]
-      },
-      {
-        name: "chapterID_UNIQUE",
-        unique: true,
-        using: "BTREE",
-        fields: [
-          { name: "chapterID" },
         ]
       },
       {
