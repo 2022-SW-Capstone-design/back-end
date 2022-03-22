@@ -11,7 +11,7 @@ const indexRouter = require('./routes/index');
 const { sequelize } = require('./models');
 
 const app = express();
-app.set('port', process.env.PORT || 8081); // 임시포트
+app.set('port', process.env.PORT || 3001); // 임시포트
 
 // app.set('view engine', 'html');
 
@@ -34,6 +34,7 @@ app.use(express.urlencoded({ extended: false }));
 const testQuery = require('./testQueries');
 
 // John 생성 후 소설 2개와 각각 챕터 1개씩 생성
+
 // testQuery.userCreate("John123", "asdf", "John", 0);
 // testQuery.novelCreate("Harry Poter", "HELLO", "Fantasy", 1234, "John123", "cover-1234.png");
 // testQuery.chapterCreate(1, "Chap1. name", "chap-1234-1.txt", 1234);
