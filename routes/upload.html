@@ -1,7 +1,18 @@
-<form action="http://172.20.132.149:3001/upload/chapter" method="post">
-    <p><input type="text" name="title" placeholder="제목" width = "500"></p>
+<form action="http://172.20.0.215:3001/upload/chapter" method="post">
     <p>
-        <textarea name="content" placeholder="내용" width = "600"></textarea>
+        <input type="text" name="title" placeholder="제목">
+    </p>
+    <p>
+        <textarea name="content" placeholder="내용" width="600"></textarea>
+    </p>
+    <p>
+        <select name = price size = 1>
+            <option value=50> 50 </option>
+            <option value=100> 100 </option>
+            <option value=150> 150 </option>
+            <option value=200> 200 </option>
+
+        </select>
     </p>
     <p>
         <input type="submit">

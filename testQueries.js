@@ -36,13 +36,14 @@ module.exports = {
         }
     },
 
-    chapterCreate: async (chapid, title, file, novelid) => {
+    chapterCreate: async (chapid, title, file, novelid, chapterPrice) => {
         try {
             await Chapter.create({
                 chapterID: chapid,
                 chapterTitle: title,
                 chapterFileName: file,
                 Novel_novelID: novelid,
+                chapterPrice: chapterPrice
             }).then(console.log(`${title} created.`));
 
         } catch (err) {

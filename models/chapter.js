@@ -22,6 +22,10 @@ module.exports = function(sequelize, DataTypes) {
         model: 'novel',
         key: 'novelID'
       }
+    },
+    chapterPrice: {
+      type: DataTypes.INTEGER,
+      allowNull: true
     }
   }, {
     sequelize,
