@@ -26,6 +26,10 @@ router.get('/info/novel/:novelID', async (req, res, next) => {
     console.log(`here, novelID : ${novelID}`);
     try {
         const novelInfo = await Novel.findOne({
+            include: [{
+                model: Chapter,
+                as: 'chapters'
+            }],
             where: {
                 novelID: novelID,
             }
