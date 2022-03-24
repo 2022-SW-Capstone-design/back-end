@@ -5,15 +5,18 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const passport = require('passport');
+const passportConfig = require('./passport');
 
 dotenv.config();
 const indexRouter = require('./routes/index');
+const authRouter = require('./routes/auth');
 const { sequelize } = require('./models');
 
 const app = express();
 app.set('port', process.env.PORT || 8081); // 임시포트
+passportConfig();
 
-// app.set('view engine', 'html');
 
 sequelize.sync({ force: false })
     .then(() => {
@@ -28,6 +31,8 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, '../client/myapp/public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(passport.initialize());
+
 
 
 // db 테스트용 데이터 추가
@@ -51,6 +56,7 @@ const testQuery = require('./testQueries');
 
 // router 핸들링
 app.use('/', indexRouter);
+app.use('/auth', authRouter);
 
 // no router
 app.use((req, res, next) => {
