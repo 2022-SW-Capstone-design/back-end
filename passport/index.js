@@ -8,13 +8,13 @@ const User = require('../models/user');
 
 module.exports = () => {
     passport.serializeUser((user, done) => {
-        done(null, user.email);
+        done(null, user.userID);
     });
 
-    passport.deserializeUser((email, done) => {
+    passport.deserializeUser((userID, done) => {
         User.findOne({
             where: {
-                userID : email
+                userID : userID
             }
         })
         .then( user => done(null, user))

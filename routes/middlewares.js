@@ -14,5 +14,16 @@ module.exports = {
         } else {
             res.json({"message" : "로그아웃 필요"});
         }
+    },
+    verifyToken : (req, res, next) => {
+        const bearerHeader = req.headers['authorization'];
+        if(bearerHeader === undefined) {
+            res.sendStatus(403);
+        }
+
+        const token = bearerHeader.split(' ')[1];
+        req.token = token;
+        
+        next();
     }
 };

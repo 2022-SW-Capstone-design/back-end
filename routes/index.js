@@ -1,7 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 const path = require('path');
+const multer = require('multer');
 const fs = require('fs');
+const { v4 : uuidv4 } = require('uuid');
+const { verifyToken } = require('./middlewares');
 
 const {
     User,
@@ -12,6 +16,21 @@ const {
 } = require('../models');
 const CreateQuery = require('../testQueries.js');
 const { Console } = require('console');
+
+// multer middleware
+const coverUpload = multer({
+    storage: multer.diskStorage({
+      destination(req, file, cb) {
+        cb(null, 'uploads/covers');
+      },
+      filename(req, file, cb) {
+        const ext = path.extname(file.originalname); //uuidv4로 변경예정
+        cb(null, path.basename(file.originalname, ext) + Date.now() + ext);
+      },
+    }),
+    limits: { fileSize: 5 * 1024 * 1024 }, //임시 크기
+  });
+
 
 // test page
 router.get('/test', async (req, res, next) => {
@@ -160,5 +179,40 @@ router.post('/upload/chapter', async (req, res, next) => {
         console.log('챕터ID, 또는 소설ID가 잘못되었습니다.');
     }
 });
+
+// 소설 업로드
+router.post('/upload/novel', verifyToken, coverUpload.single('coverImage'), async (req, res, next) => {
+    const { 
+        novelTitle, 
+        novelDescription, 
+        novelGenre, 
+        defaultPrice,
+    } = req.body;
+
+    jwt.verify(req.token, process.env.JWT_SECRET_KEY, (err, authData) => {
+        if(err) {
+            console.log(err);
+            next(err);
+        }
+        const userID = authData.userID;
+        const novelID = 12345; // uuidv4로 변경예정
+
+        try {
+            await Novel.create({
+                novelTitle,
+                novelDescription,
+                novelGenre,
+                novelID,
+                userID,
+                coverFileName : req.file.filename,
+                defaultPrice
+            });
+        } catch (err) {
+            console.log(err);
+            next(err);
+        }
+    })
+});
+
 
 module.exports = router;

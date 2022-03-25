@@ -11,10 +11,10 @@ module.exports = ()  => {
         secretOrKey: process.env.JWT_SECRET_KEY,
     }, async(jwtPayload, done) => {
         try {
-            console.log(`jwt email :${jwtPayload.email}`);
+            console.log(`jwt email :${jwtPayload.userID}`);
             const user = await User.findOne({
                 where: {
-                    userID : jwtPayload.email
+                    userID : jwtPayload.userID
                 }
             });
             if(user) {

@@ -13,11 +13,11 @@ const router = express.Router();
 
 //회원가입
 router.post('/join', isNotLoggedIn, async (req, res, next) => {
-    const { email, nickname, password } = req.body;
+    const { userID, nickname, password } = req.body;
     try {
         const user = await User.findOne({
             where: {
-                userID : email
+                userID : userID
             }
         });
         if(user) {
@@ -26,11 +26,11 @@ router.post('/join', isNotLoggedIn, async (req, res, next) => {
         const hashed = await bcrypt.hash(password, 12); //salt roud 12번
         
         await User.create({
-            userID : email,
+            userID : userID,
             password : hashed,
             nickname : nickname,
             coin : 0,
-        }).then(console.log(`${email} created.`));
+        }).then(console.log(`${userID} created.`));
         return res.json({ "result" : "success" });
     } catch(err) {
         console.log(err);
@@ -56,7 +56,7 @@ router.post('/login', isNotLoggedIn, async (req, res, next) => {
                 }
 
                 const token = jwt.sign({
-                    email: user.userID,
+                    userID: user.userID,
                     nickname: user.nickname,
                     // auth: user.auth
                 }, 
@@ -95,29 +95,29 @@ router.post('/google', async(req, res, next) => {
             requiredAudience: process.env.GOOGLE_CLIENT_ID
         });
 
-        const { name, email } = ticket.getPayload();
+        const { name, userID } = ticket.getPayload();
         
         const user = await User.findOne({
             where: {
-                userID : email
+                userID : userID
             }
         });
        
         if(user) {
-            console.log(`${email} found.`);
+            console.log(`${userID} found.`);
             
         }
         else {
             await User.create({
-                userID : email,
+                userID : userID,
                 password : "asdf", // 구글 로그인 시 비밀번호는 필요가 없게 됨
                 nickname : name,
                 coin : 0,
-            }).then(user => console.log(`${email} created.`));
+            }).then(user => console.log(`${userID} created.`));
         }
 
         const token = jwt.sign({
-            email: email,
+            userID: userID,
             nickname: name,
             // auth: user.auth
         }, 
