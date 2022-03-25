@@ -6,13 +6,13 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true
     },
-    chapterTitle: {
+    chapterName: {
       type: DataTypes.STRING(45),
       allowNull: false
     },
     chapterFileName: {
       type: DataTypes.STRING(45),
-      allowNull: false
+      allowNull: true
     },
     Novel_novelID: {
       type: DataTypes.INTEGER,
@@ -22,6 +22,10 @@ module.exports = function(sequelize, DataTypes) {
         model: 'novel',
         key: 'novelID'
       }
+    },
+    comment: {
+      type: DataTypes.STRING(100),
+      allowNull: true
     },
     chapterPrice: {
       type: DataTypes.INTEGER,

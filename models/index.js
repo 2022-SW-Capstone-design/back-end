@@ -16,5 +16,6 @@ db.User = models.user;
 db.Novel = models.novel;
 db.Owned_contents = models.owned_contents;
 db.Chapter = models.chapter;
+db.Usercomment = models.usercomment;
 
 module.exports = db;

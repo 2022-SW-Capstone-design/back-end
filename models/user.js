@@ -8,16 +8,15 @@ module.exports = function(sequelize, DataTypes) {
     },
     password: {
       type: DataTypes.STRING(100),
-      allowNull: false
+      allowNull: true
     },
     nickname: {
       type: DataTypes.STRING(45),
-      allowNull: false
+      allowNull: true
     },
     coin: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0
+      allowNull: true
     }
   }, {
     sequelize,
