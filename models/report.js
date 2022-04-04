@@ -1,34 +1,24 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('usercomment', {
+  return sequelize.define('report', {
     id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    Chapter_id: {
-      type: DataTypes.INTEGER,
+    User_id: {
+      type: DataTypes.STRING(45),
       allowNull: false,
-      primaryKey: true,
       references: {
-        model: 'chapter',
+        model: 'user',
         key: 'id'
       }
     },
-    Chapter_Novel_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      references: {
-        model: 'chapter',
-        key: 'Novel_id'
-      }
-    },
-    nickname: {
+    category: {
       type: DataTypes.STRING(45),
       allowNull: false
     },
-    rating: {
+    commentId: {
       type: DataTypes.INTEGER,
       allowNull: true
     },
@@ -36,13 +26,21 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.TEXT,
       allowNull: false
     },
-    likeCount: {
-      type: DataTypes.INTEGER,
+    title: {
+      type: DataTypes.STRING(45),
+      allowNull: false
+    },
+    time: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    solved: {
+      type: DataTypes.TINYINT,
       allowNull: true
     }
   }, {
     sequelize,
-    tableName: 'usercomment',
+    tableName: 'report',
     timestamps: false,
     indexes: [
       {
@@ -51,16 +49,13 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "id" },
-          { name: "Chapter_id" },
-          { name: "Chapter_Novel_id" },
         ]
       },
       {
-        name: "fk_UserComment_Chapter1",
+        name: "fk_Report_User1",
         using: "BTREE",
         fields: [
-          { name: "Chapter_id" },
-          { name: "Chapter_Novel_id" },
+          { name: "User_id" },
         ]
       },
     ]

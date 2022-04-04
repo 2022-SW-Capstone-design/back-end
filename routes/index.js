@@ -15,7 +15,6 @@ const {
     sequelize
 } = require('../models');
 const CreateQuery = require('../testQueries.js');
-const { Console } = require('console');
 
 // multer middleware
 const coverUpload = multer({
@@ -189,7 +188,7 @@ router.post('/upload/novel', verifyToken, coverUpload.single('coverImage'), asyn
         defaultPrice,
     } = req.body;
 
-    jwt.verify(req.token, process.env.JWT_SECRET_KEY, (err, authData) => {
+    jwt.verify(req.token, process.env.JWT_SECRET_KEY, async (err, authData) => {
         if(err) {
             console.log(err);
             next(err);

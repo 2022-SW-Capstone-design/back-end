@@ -1,33 +1,37 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('chapter', {
-    chapterID: {
+    id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    chapterName: {
-      type: DataTypes.STRING(45),
-      allowNull: false
-    },
-    chapterFileName: {
-      type: DataTypes.STRING(45),
-      allowNull: true
-    },
-    Novel_novelID: {
+    Novel_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
       references: {
         model: 'novel',
-        key: 'novelID'
+        key: 'id'
       }
+    },
+    title: {
+      type: DataTypes.STRING(45),
+      allowNull: false
+    },
+    fileName: {
+      type: DataTypes.STRING(45),
+      allowNull: false
     },
     comment: {
       type: DataTypes.STRING(100),
       allowNull: true
     },
-    chapterPrice: {
+    price: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    likeCount: {
       type: DataTypes.INTEGER,
       allowNull: true
     }
@@ -41,15 +45,15 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "chapterID" },
-          { name: "Novel_novelID" },
+          { name: "id" },
+          { name: "Novel_id" },
         ]
       },
       {
         name: "fk_Chapter_Novel1_idx",
         using: "BTREE",
         fields: [
-          { name: "Novel_novelID" },
+          { name: "Novel_id" },
         ]
       },
     ]

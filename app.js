@@ -40,13 +40,13 @@ app.use(passport.initialize());
 const testQuery = require('./testQueries');
 
 // John 생성 후 소설 2개와 각각 챕터 1개씩 생성
-// testQuery.userCreate("John123", "asdf", "John", 0);
-// testQuery.novelCreate("Harry Poter", "HELLO", "Fantasy", 1234, "John123", "cover-1234.png");
-// testQuery.chapterCreate(1, "Chap1. name", "chap-1234-1.txt", 1234);
-// testQuery.ownedCreate(1234, 1, "John123", true);
-// testQuery.novelCreate("Harry Poter 2", "HELLOO", "Fantasy", 1235, "John123", "cover-1235.png");
-// testQuery.chapterCreate(1, "Chap1. name2", "chap-1235-1.txt", 1235);
-// testQuery.ownedCreate(1235, 1, "John123", true);
+testQuery.userCreate("john123@ajou.ac.kr", "asdf", "John", 0, 0);
+testQuery.novelCreate(777, "john123@ajou.ac.kr", "Harry Poter", "HELLO", "Fantasy", "cover-1234.png", 10);
+testQuery.chapterCreate(123, 777, "Chap1. name1", "chap-777-1.md", null, null, 3);
+testQuery.ownedCreate(1, 123, "john123@ajou.ac.kr", "chapter", true);
+testQuery.novelCreate(888, "john123@ajou.ac.kr", "Harry Poter 2", "HELLO2", "Fantasy", "cover-1235.png", 10);
+testQuery.chapterCreate(456, 777, "Chap2. name2", "chap-888-1.md", null, 8, 4);
+testQuery.ownedCreate(2, 456, "john123@ajou.ac.kr", "chapter", true);
 
 // Mike 생성 후 소설 1개와 챕터 1개 생성, John이 구입
 // testQuery.userCreate("Mike123", "asdfq", "Mike", 0);
@@ -54,6 +54,12 @@ const testQuery = require('./testQueries');
 // testQuery.chapterCreate(1, "Chap1. name", "chap-1236-1.txt", 1236);
 // testQuery.ownedCreate(1236, 1, "Mike123", true);
 // testQuery.ownedCreate(1236, 2, "John123", false);
+testQuery.userCreate("mike321@ajou.ac.kr", "asdf", "Mike", 0, 1);
+testQuery.novelCreate(999, "mike321@ajou.ac.kr", "Spider man", "HELLO", "Action", "cover-1236.png", 11);
+testQuery.chapterCreate(789, 999, "Chap1. name1", "chap-999-1.md", null, null, 3);
+testQuery.ownedCreate(3, 789, "John123@ajou.ac.kr", "chapter", false);
+
+
 
 // router 핸들링
 app.use('/', indexRouter);

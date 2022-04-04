@@ -1,21 +1,25 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('user', {
-    userID: {
+    id: {
       type: DataTypes.STRING(45),
       allowNull: false,
       primaryKey: true
     },
     password: {
       type: DataTypes.STRING(100),
-      allowNull: true
+      allowNull: false
     },
     nickname: {
       type: DataTypes.STRING(45),
-      allowNull: true
+      allowNull: false
     },
     coin: {
       type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    admin: {
+      type: DataTypes.TINYINT,
       allowNull: true
     }
   }, {
@@ -28,7 +32,7 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "userID" },
+          { name: "id" },
         ]
       },
     ]

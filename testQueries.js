@@ -4,63 +4,118 @@ const {
     User,
     Novel,
     Chapter,
-    Owned_contents
+    OwnedContent,
+    Illust,
+    UserComment,
+    Report
 } = require('./models');
 
 module.exports = {
-    userCreate: async (id, pw, nick, coin) => {
+    userCreate: async (id, password, nickname, coin, admin) => {
         try {
             await User.create({
-                userID: id,
-                password: pw,
-                nickname: nick,
-                coin: coin,
+                id,
+                password,
+                nickname,
+                coin,
+                admin
             }).then(console.log(`${id} created.`));
         } catch (err) {
-            //console.log(err);
+            // throw err;
         }
     },
 
-    novelCreate: async (title, intro, genre, id, userid, cover) => {
+    novelCreate: async (id, User_id, title, description, genre, coverFileName, defaultPrice) => {
         try {
             await Novel.create({
-                novelTitle: title,
-                novelDescription: intro,
-                novelGenre: genre,
-                novelID: id,
-                User_userID: userid,
-                coverFileName: cover,
+                id,
+                User_id,
+                title,
+                description,
+                genre,
+                coverFileName,
+                defaultPrice
             }).then(console.log(`${title} created.`));
         } catch (err) {
-            //console.log(err);
+            // throw err;
         }
     },
 
-    chapterCreate: async (chapid, title, file, novelid, chapterPrice) => {
+    chapterCreate: async (id, Novel_id, title, fileName, comment, price, likeCount) => {
         try {
             await Chapter.create({
-                chapterID: chapid,
-                chapterTitle: title,
-                chapterFileName: file,
-                Novel_novelID: novelid,
-                chapterPrice: chapterPrice
+                id,
+                Novel_id,
+                title,
+                fileName,
+                comment,
+                price,
+                likeCount
             }).then(console.log(`${title} created.`));
 
         } catch (err) {
-            //console.log(err);
+            // throw err;
         }
     },
 
-    ownedCreate: async (novelid, chapid, userid, own) => {
+    ownedCreate: async (id, contentId, User_id, type, own) => {
         try {
-            await Owned_contents.create({
-                novelID: novelid,
-                chapterID: chapid,
-                User_userID: userid,
-                own: own,
+            await OwnedContent.create({
+                id,
+                contentId,
+                User_id,
+                type,
+                own
             }).then(console.log(`own created.`));
         } catch (err) {
-            //console.log(err);
+            // throw err;
+        }
+    },
+
+    illustCreate: async (id, Chapter_id, Chapter_Novel_id, price, fileName, index) => {
+        try {
+            await Illust.create({
+                id,
+                Chapter_id,
+                Chapter_Novel_id,
+                price,
+                fileName,
+                index
+            }).then(console.log(`illust created.`));
+        } catch (err) {
+            // throw err;
+        }
+    },
+
+    userCommentCreate: async (id, Chapter_id, Chapter_Novel_id, rating, content, likeCount) => {
+        try {
+            await UserComment.create({
+                id,
+                Chapter_id,
+                Chapter_Novel_id,
+                rating,
+                content,
+                likeCount
+            }).then(console.log(`user comment created.`));
+        } catch (err) {
+            // throw err;
+        }
+    },
+
+    ReportCreate: async (id, User_id, category, commentId, content, title, time, solved) => {
+        try {
+            await Report.create({
+                id,
+                User_id,
+                category,
+                commentId,
+                content,
+                title,
+                time,
+                solved
+            }).then(console.log(`report created.`));
+        } catch (err) {
+            // throw err;
         }
     },
 }

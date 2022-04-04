@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('usercomment', {
+  return sequelize.define('illust', {
     id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -24,25 +24,21 @@ module.exports = function(sequelize, DataTypes) {
         key: 'Novel_id'
       }
     },
-    nickname: {
-      type: DataTypes.STRING(45),
-      allowNull: false
-    },
-    rating: {
+    price: {
       type: DataTypes.INTEGER,
       allowNull: true
     },
-    content: {
-      type: DataTypes.TEXT,
+    fileName: {
+      type: DataTypes.STRING(100),
       allowNull: false
     },
-    likeCount: {
+    index: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: false
     }
   }, {
     sequelize,
-    tableName: 'usercomment',
+    tableName: 'illust',
     timestamps: false,
     indexes: [
       {
@@ -56,7 +52,7 @@ module.exports = function(sequelize, DataTypes) {
         ]
       },
       {
-        name: "fk_UserComment_Chapter1",
+        name: "fk_Illust_Chapter1",
         using: "BTREE",
         fields: [
           { name: "Chapter_id" },

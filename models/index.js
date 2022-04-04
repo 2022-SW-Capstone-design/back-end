@@ -14,8 +14,12 @@ db.Sequelize = Sequelize;
 
 db.User = models.user;
 db.Novel = models.novel;
-db.Owned_contents = models.owned_contents;
+db.OwnedContent = models.ownedcontent;
 db.Chapter = models.chapter;
-db.Usercomment = models.usercomment;
+db.UserComment = models.usercomment;
+db.CriticComment = models.criticcomment;
+db.Illust = models.illust;
+db.Music = models.music;
+db.Report = models.report;
 
 module.exports = db;

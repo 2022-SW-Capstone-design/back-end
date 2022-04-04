@@ -1,31 +1,31 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('novel', {
-    novelTitle: {
-      type: DataTypes.STRING(45),
-      allowNull: true
-    },
-    novelDescription: {
-      type: DataTypes.TEXT,
-      allowNull: true
-    },
-    novelGenre: {
-      type: DataTypes.STRING(45),
-      allowNull: true
-    },
-    novelID: {
+    id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    User_userID: {
+    User_id: {
       type: DataTypes.STRING(45),
       allowNull: false,
       primaryKey: true,
       references: {
         model: 'user',
-        key: 'userID'
+        key: 'id'
       }
+    },
+    title: {
+      type: DataTypes.STRING(45),
+      allowNull: false
+    },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    genre: {
+      type: DataTypes.STRING(45),
+      allowNull: true
     },
     coverFileName: {
       type: DataTypes.STRING(45),
@@ -33,7 +33,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     defaultPrice: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: false
     }
   }, {
     sequelize,
@@ -45,8 +45,8 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "novelID" },
-          { name: "User_userID" },
+          { name: "id" },
+          { name: "User_id" },
         ]
       },
       {
@@ -54,14 +54,14 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "novelID" },
+          { name: "id" },
         ]
       },
       {
         name: "fk_Novel_User1_idx",
         using: "BTREE",
         fields: [
-          { name: "User_userID" },
+          { name: "User_id" },
         ]
       },
     ]
