@@ -1,43 +1,43 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('usercomment', {
+  return sequelize.define('likedcontent', {
     id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    Chapter_id: {
-      type: DataTypes.INTEGER,
+    User_id: {
+      type: DataTypes.STRING(45),
       allowNull: false,
       references: {
-        model: 'chapter',
+        model: 'user',
         key: 'id'
       }
     },
-    Chapter_Novel_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'chapter',
-        key: 'Novel_id'
-      }
-    },
-    userId: {
+    type: {
       type: DataTypes.STRING(45),
       allowNull: false
     },
-    content: {
-      type: DataTypes.TEXT,
+    novelId: {
+      type: DataTypes.INTEGER,
       allowNull: false
     },
-    rating: {
-      type: DataTypes.FLOAT,
+    chapterId: {
+      type: DataTypes.INTEGER,
       allowNull: true
+    },
+    contentId: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    like: {
+      type: DataTypes.TINYINT,
+      allowNull: false
     }
   }, {
     sequelize,
-    tableName: 'usercomment',
+    tableName: 'likedcontent',
     timestamps: false,
     indexes: [
       {
@@ -49,11 +49,10 @@ module.exports = function(sequelize, DataTypes) {
         ]
       },
       {
-        name: "fk_UserComment_Chapter1",
+        name: "fk_LikedContent_User1_idx",
         using: "BTREE",
         fields: [
-          { name: "Chapter_id" },
-          { name: "Chapter_Novel_id" },
+          { name: "User_id" },
         ]
       },
     ]

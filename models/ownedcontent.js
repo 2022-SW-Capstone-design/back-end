@@ -2,11 +2,7 @@ const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('ownedcontent', {
     id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true
-    },
-    contentId: {
+      autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
@@ -14,7 +10,6 @@ module.exports = function(sequelize, DataTypes) {
     User_id: {
       type: DataTypes.STRING(45),
       allowNull: false,
-      primaryKey: true,
       references: {
         model: 'user',
         key: 'id'
@@ -23,6 +18,18 @@ module.exports = function(sequelize, DataTypes) {
     type: {
       type: DataTypes.STRING(45),
       allowNull: false
+    },
+    novelId: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    chapterId: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    contentId: {
+      type: DataTypes.INTEGER,
+      allowNull: true
     },
     own: {
       type: DataTypes.BOOLEAN,
@@ -39,12 +46,10 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "id" },
-          { name: "contentId" },
-          { name: "User_id" },
         ]
       },
       {
-        name: "fk_Library_User1",
+        name: "fk_OwnedContent_User1_idx",
         using: "BTREE",
         fields: [
           { name: "User_id" },

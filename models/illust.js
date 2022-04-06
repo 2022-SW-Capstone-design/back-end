@@ -2,6 +2,7 @@ const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('illust', {
     id: {
+      autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
@@ -9,7 +10,6 @@ module.exports = function(sequelize, DataTypes) {
     Chapter_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true,
       references: {
         model: 'chapter',
         key: 'id'
@@ -18,11 +18,14 @@ module.exports = function(sequelize, DataTypes) {
     Chapter_Novel_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true,
       references: {
         model: 'chapter',
         key: 'Novel_id'
       }
+    },
+    userId: {
+      type: DataTypes.STRING(45),
+      allowNull: false
     },
     price: {
       type: DataTypes.INTEGER,
@@ -35,6 +38,10 @@ module.exports = function(sequelize, DataTypes) {
     index: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    likes: {
+      type: DataTypes.INTEGER,
+      allowNull: true
     }
   }, {
     sequelize,
@@ -47,8 +54,6 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "id" },
-          { name: "Chapter_id" },
-          { name: "Chapter_Novel_id" },
         ]
       },
       {

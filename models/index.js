@@ -21,5 +21,6 @@ db.CriticComment = models.criticcomment;
 db.Illust = models.illust;
 db.Music = models.music;
 db.Report = models.report;
+db.LikedContent = models.likedcontent;
 
 module.exports = db;

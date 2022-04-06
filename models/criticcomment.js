@@ -2,6 +2,7 @@ const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('criticcomment', {
     id: {
+      autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
@@ -9,7 +10,6 @@ module.exports = function(sequelize, DataTypes) {
     Novel_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true,
       references: {
         model: 'novel',
         key: 'id'
@@ -18,7 +18,6 @@ module.exports = function(sequelize, DataTypes) {
     Novel_User_id: {
       type: DataTypes.STRING(45),
       allowNull: false,
-      primaryKey: true,
       references: {
         model: 'novel',
         key: 'User_id'
@@ -31,6 +30,14 @@ module.exports = function(sequelize, DataTypes) {
     content: {
       type: DataTypes.TEXT,
       allowNull: false
+    },
+    rating: {
+      type: DataTypes.FLOAT,
+      allowNull: true
+    },
+    likes: {
+      type: DataTypes.INTEGER,
+      allowNull: true
     }
   }, {
     sequelize,
@@ -43,8 +50,6 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "id" },
-          { name: "Novel_id" },
-          { name: "Novel_User_id" },
         ]
       },
       {
