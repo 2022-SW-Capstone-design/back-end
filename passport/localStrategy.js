@@ -7,13 +7,13 @@ const { User } = require('../models');
 
 module.exports = () => {
     passport.use(new LocalStrategy({
-        usernameField : 'userID',
+        usernameField : 'userId',
         passwordField : 'password',
-    }, async(userID, password, done) => {
+    }, async(userId, password, done) => {
         try {
             const user = await User.findOne({
                 where: {
-                    userID : userID
+                    id : userId
                 }
             });
             if(user) {
