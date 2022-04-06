@@ -5,6 +5,7 @@ const {
     Novel,
     Chapter,
     OwnedContent,
+    LikedContent,
     Illust,
     UserComment,
     Report
@@ -22,90 +23,95 @@ module.exports = {
             }).then(console.log(`${id} created.`));
         } catch (err) {
             // throw err;
+            console.error(err);
         }
     },
 
-    novelCreate: async (id, User_id, title, description, genre, coverFileName, defaultPrice) => {
+    novelCreate: async (User_id, title, description, genre, coverFileName, defaultPrice, rating) => {
         try {
             await Novel.create({
-                id,
                 User_id,
                 title,
                 description,
                 genre,
                 coverFileName,
-                defaultPrice
+                defaultPrice,
+                rating
             }).then(console.log(`${title} created.`));
         } catch (err) {
+            console.error(err);
             // throw err;
         }
     },
 
-    chapterCreate: async (id, Novel_id, title, fileName, comment, price, likeCount) => {
+    chapterCreate: async (Novel_id, title, fileName, comment, price) => {
         try {
             await Chapter.create({
-                id,
                 Novel_id,
                 title,
                 fileName,
                 comment,
-                price,
-                likeCount
+                price
             }).then(console.log(`${title} created.`));
 
         } catch (err) {
             // throw err;
+            console.error(err);
         }
     },
 
-    ownedCreate: async (id, contentId, User_id, type, own) => {
+    ownedCreate: async (User_id, type, novelId, chapterId, contentId, own) => {
         try {
             await OwnedContent.create({
-                id,
-                contentId,
                 User_id,
                 type,
+                novelId,
+                chapterId,
+                contentId,
                 own
             }).then(console.log(`own created.`));
         } catch (err) {
             // throw err;
+            console.error(err);
         }
     },
 
-    illustCreate: async (id, Chapter_id, Chapter_Novel_id, price, fileName, index) => {
+    illustCreate: async (Chapter_id, Chapter_Novel_id, userId, price, fileName, index, likes) => {
         try {
             await Illust.create({
-                id,
                 Chapter_id,
                 Chapter_Novel_id,
+                userId,
                 price,
                 fileName,
-                index
+                index,
+                likes
             }).then(console.log(`illust created.`));
         } catch (err) {
             // throw err;
+            console.error(err);
         }
     },
 
-    userCommentCreate: async (id, Chapter_id, Chapter_Novel_id, rating, content, likeCount) => {
+    userCommentCreate: async (Chapter_id, Chapter_Novel_id, userId, content, rating) => {
         try {
             await UserComment.create({
-                id,
+                // id,
                 Chapter_id,
                 Chapter_Novel_id,
-                rating,
+                userId, 
                 content,
-                likeCount
+                rating,
             }).then(console.log(`user comment created.`));
         } catch (err) {
             // throw err;
+            console.error(err);
         }
     },
 
-    ReportCreate: async (id, User_id, category, commentId, content, title, time, solved) => {
+    reportCreate: async (User_id, category, commentId, content, title, time, solved) => {
         try {
             await Report.create({
-                id,
                 User_id,
                 category,
                 commentId,
@@ -116,6 +122,7 @@ module.exports = {
             }).then(console.log(`report created.`));
         } catch (err) {
             // throw err;
+            console.error(err);
         }
-    },
+    }
 }
