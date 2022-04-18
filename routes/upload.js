@@ -9,6 +9,7 @@ const { verifyToken } = require('./middlewares');
 const {
     User,
     Novel,
+    Illust,
     Chapter,
     Owned_contents,
     sequelize
@@ -126,8 +127,28 @@ router.post('/img', async (req, res, next) => {
 
 // 챕터에 삽입된 일러스트 위치데이터 db에 저장
 router.post('/illust', async (req, res, next) => {
-    const { novelId, chapterId, imgURLs } = req.body;
+    const { novelId, chapterId, imgURLs, userId, price } = req.body;
     
-})
+    
+    Promise.all(imgURLs.map(async imgURL => {
+        try {
+            const { url, index } = imgURL;
+            console.log(`url : ${url}, index : ${index}`);
+            Illust.create({
+                Chapter_id : chapterId,
+                Chapter_Novel_id : novelId,
+                userId,
+                price,
+                fileName: url,
+                index,
+                likes: 0
+            });
+        } catch(err) {
+            console.error(err);
+            next(err);
+        }
+    }));
+    res.json({"message" : "illust upload success"});
+});
 
 module.exports = router;
