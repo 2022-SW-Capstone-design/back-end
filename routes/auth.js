@@ -89,7 +89,7 @@ router.post('/jwt', passport.authenticate('jwt', { session: false }),
 // passport 이용 안하고 바로 응답
 router.post('/google', async(req, res, next) => {
     try {
-        const tokenId = req.body.tokenId;
+        const tokenId = req.body.googleTokenId;
         console.log(tokenId);
         const ticket = await client.verifyIdToken({
             idToken: tokenId,
