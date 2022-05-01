@@ -38,6 +38,7 @@ router.get('/info/novel/:novelId', async (req, res, next) => {
 
     } catch (err) {
         console.log(err);
+        next(err);
     }
 });
 
@@ -53,24 +54,25 @@ router.get('/written/novel', verifyToken, async (req, res, next) => {
                 User_id: userId,
             }
         }).then(async writtenNovels => {
-            if(writtenNovels) {
-                const nickname = await User.findOne({
-                    attributes: ["nickname"],
-                    where: {
-                        id : writtenNovels[0].User_id
-                    },
-                    raw: true,
-                });
-                writtenNovels.map(novel => {
-                    novel['nickname'] = nickname.nickname;
-                })
-            }
+            // if(writtenNovels) {
+            //     const nickname = await User.findOne({
+            //         attributes: ["nickname"],
+            //         where: {
+            //             id : writtenNovels[0].User_id
+            //         },
+            //         raw: true,
+            //     });
+            //     writtenNovels.map(novel => {
+            //         novel['nickname'] = nickname.nickname;
+            //     })
+            // }
             console.log('server result : ', writtenNovels);
-            res.json(writtenNovels);
+            res.json(writtenNovels); 
         })
 
     } catch (err) {
         console.log(err);
+        next(err);
     }
 });
 
@@ -125,6 +127,62 @@ router.get('/content/novel/:novelId/chapter/:chapterId', async (req, res, next) 
         });
     } catch (err) {
         console.log(err);
+    }
+});
+
+router.post('/comment/user', verifyToken, async (req, res, next) => {
+    const { chapterId, novelId, userId, rating, content } = req.body;
+    try {
+        await UserComment.create({
+            Chapter_id : chapterId,
+            Chapter_Novel_id : novelId,
+            userId,
+            rating,
+            content
+        });
+
+    } catch(err) {
+        console.error(err);
+        next(err);
+    }
+    res.end();
+});
+
+router.get('/comment/user/:novelId/:chapterId', async (req, res, next) => {
+    const { novelId, chapterId } = req.params;
+    try {
+        const query = `
+        select User.id as commentId, nickname, rating, content
+        from User, UserComment
+        where User.id = UserComment.userId
+        and Chapter_id = ${chapterId}
+        and Chapter_Novel_id = ${novelId};
+        `
+        await sequelize.query(query, {
+            type: sequelize.QueryTypes.SELECT
+        }).then(result => {
+            res.json({'comments' : result});
+        });
+    } catch(err) {
+        console.error(err);
+        next(err);
+    }
+});
+
+router.get('/list/novel/:novelId', async (req, res, next) => {
+    const novelId = req.params.novelId;
+
+    try {
+        const chapters = await Chapter.findAll({
+            where:{
+                Novel_id: novelId
+            },
+            raw: true
+        });
+        res.json({"chatpers" : chapters});
+    } catch(err) {
+        console.error(err);
+        next(err);
     }
 });
 
