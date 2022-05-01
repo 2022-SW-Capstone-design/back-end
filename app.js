@@ -13,6 +13,7 @@ dotenv.config();
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
 const uploadRouter = require('./routes/upload');
+const commentRouter = require('./routes/comment');
 
 const { sequelize } = require('./models');
 
@@ -44,6 +45,7 @@ app.use(passport.initialize());
 app.use('/', indexRouter);
 app.use('/auth', authRouter);
 app.use('/upload', uploadRouter);
+app.use('/comment', commentRouter);
 
 // no router
 app.use((req, res, next) => {
