@@ -24,10 +24,6 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(45),
       allowNull: false
     },
-    comment: {
-      type: DataTypes.STRING(100),
-      allowNull: true
-    },
     price: {
       type: DataTypes.INTEGER,
       allowNull: true
