@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { Report } = require('../models');
 
+//사용자가 등록한 신고를 서버에 업로드(연수 테스트 ok)
 router.post('/upload', async (req, res, next) => {
     const { userId, title, commentId, category, content } = req.body;
     try {
