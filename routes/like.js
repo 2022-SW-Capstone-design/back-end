@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-//평점댓글에 좋아요 개수 1만큼 추가 / 이미 좋아요 상태라면 1 감소 (연수 테스트 ok)
+//평론댓글에 좋아요 개수 1만큼 추가 / 이미 좋아요 상태라면 1 감소 (연수 테스트 ok)
 router.post('/comment/:commentId',async(req,res,next)=>{//파라미터
     const id = req.params.commentId;//url로 req.body, req.prams res.query세개 구분?
     try{

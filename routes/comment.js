@@ -61,13 +61,25 @@ router.post('/critic', verifyToken, async (req, res, next) => {
 })
 
 router.get('/user/:novelId/:chapterId',  async (req, res, next) => {
-    var page = Number(req.query.page);
-    var each = Number(req.query.each);
+    
+    if (req.query.page == undefined) {
+        var page = 1
+    } else {
+        var page = Number(req.query.page);
+    }
+
+    if (req.query.each == undefined) {
+        var each = 10
+    } else {
+        var each = Number(req.query.each);
+    }
 
     if (req.query.sorted == 'old') {
-        sorted = 'asc'
+        var sorted = 'asc'
     } else if (req.query.sorted == 'new') {
-        sorted = 'desc'
+        var sorted = 'desc'
+    } else if (req.query.sorted == undefined) {
+        var sorted = 'desc'
     }
 
     try {
@@ -92,9 +104,11 @@ router.get('/critic/:novelId', async (req, res, next) => {
     var each = Number(req.query.each);
 
     if (req.query.sorted == 'old') {
-        sorted = 'asc'
+        var sorted = 'asc'
     } else if (req.query.sorted == 'new') {
-        sorted = 'desc'
+        var sorted = 'desc'
+    } else if (req.query.sorted == undefined) {
+        var sorted = 'desc'
     }
 
     try {
