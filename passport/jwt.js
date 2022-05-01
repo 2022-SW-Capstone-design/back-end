@@ -8,7 +8,8 @@ const { ExtractJwt, Strategy: JWTStrategy } = require('passport-jwt');
 module.exports = ()  => {
     passport.use(new JWTStrategy({
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken('authorization'),
-        secretOrKey: process.env.JWT_SECRET_KEY,
+        //secretOrKey: process.env.JWT_SECRET_KEY,
+        secretOrKey: '1234'
     }, async(jwtPayload, done) => {
         try {
             console.log(`jwt email :${jwtPayload.userId}`);
@@ -29,4 +30,3 @@ module.exports = ()  => {
         }
     }))
 };
-

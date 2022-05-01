@@ -12,7 +12,8 @@ const {
     Illust,
     Chapter,
     Owned_contents,
-    sequelize
+    sequelize,
+    Report
 } = require('../models');
 
 
@@ -80,10 +81,10 @@ router.post('/chapter', async (req, res, next) => {
 
 // 소설 업로드
 router.post('/novel', verifyToken, coverUpload.single('coverImage'), async (req, res, next) => {
-    const { 
-        title, 
-        rating, 
-        nickname, 
+    const {
+        title,
+        rating,
+        nickname,
         description,
         genre,
         novelId,
@@ -91,7 +92,7 @@ router.post('/novel', verifyToken, coverUpload.single('coverImage'), async (req,
     } = req.body;
 
     const userId = req.body.userId;
- 
+
     try {
         await Novel.create({
             id : novelId,
@@ -128,8 +129,8 @@ router.post('/img', async (req, res, next) => {
 // 챕터에 삽입된 일러스트 위치데이터 db에 저장
 router.post('/illust', async (req, res, next) => {
     const { novelId, chapterId, imgURLs, userId, price } = req.body;
-    
-    
+
+
     Promise.all(imgURLs.map(async imgURL => {
         try {
             const { url, index } = imgURL;
@@ -151,4 +152,130 @@ router.post('/illust', async (req, res, next) => {
     res.json({"message" : "illust upload success"});
 });
 
+
+
+//사용자가 해당 챕터에 대해 구매한 음악의 목록 응답 (연수 테스트ok)
+router.get('/purchased/music/:novelId/:chapterId',async(req,res,next)=>{
+    const novelId=req.params.novelId;
+    const chapterId=req.params.chapterId;
+    try{
+    const query=`
+    SELECT filename from music
+      WHERE (Chapter_Novel_id=${novelId} and Chapter_id=${chapterId}) in(
+  	     SELECT filename from Ownedcontent
+     	   where (chapterId=${chapterId} and novelId=${novelId} ));`
+         const result=await sequelize.query(query,{
+           type: sequelize.QueryTypes.SELECT
+      });
+      res.send({
+        "musics":result
+      });
+
+       }catch(err){
+     	console.error(err);
+    }
+});
+
+//해당 챕터에 대한 음악 중 사용자가 구매하지 않은 목록을 리턴(연수  테스트 ok)
+router.get('/list/music/:novelId/:chapterId', async(req,res,next)=>{
+  const novelId=req.params.novelId;
+  const chapterId=req.params.chapterId;
+
+  try{
+  const query=`
+  SELECT filename from music
+    WHERE (Chapter_Novel_id=${novelId} and Chapter_id=${chapterId}) not in(
+	     SELECT filename from Ownedcontent
+   	   where (chapterId=${chapterId} and novelId=${novelId} ));`
+       const result=await sequelize.query(query,{
+         type: sequelize.QueryTypes.SELECT
+    });
+    res.send({
+      "musics":result
+    });
+
+     }catch(err){
+   	console.error(err);
+  }
+});
+
+
+//사용자가 챕터에 대한 음악을 업로드하면 저장소에 음악파일을 저장(연수 테스트 ok)
+router.post('/music', async (req, res, next )=> {
+  const{novelId, chapterId, music, userId, price}=req.body;
+
+//  Promise.all(music.map(async music1=> {
+    try{
+      const {musicFile}= music1;
+      console.log(`musicFile:${musicFile}`);
+      await music.create({
+        Chapter_id : chapterId,//&
+        Chapter_Novel_id : novelId,//&
+        userId,
+        price,
+        fileName: musicFile,
+        likes:0
+      });
+      } catch(err) {
+          console.error(err);
+          next(err);
+      }
+//  }));
+  res.json({"message" : "music upload success"});
+});
+
+
+ // 리포트 쪽으로 옮겨주어야하는 코드들
+
+
+//사용자가 등록한 신고를 서버에 업로드(연수 테스트 ok)
+router.post('/upload', async(req,res,next)=>{
+	const{ userId, title, commentId, category, content }=req.body;
+  try{
+	const query=`
+	INSERT INTO report ( User_id,category, commentId,content,title,time,solved)
+  VALUES (${userId}, ${category},${commentId},${content}
+   ${title},NOW(),"0");`
+  }catch(err){
+	console.error(err);
+  next(err);
+  }
+res.json({"message" : "report upload success"});
+});
+
+//신고 ID에 대한 신고내용 출력(연수 테스트 ok)
+router.get('/report/content/:reportId', async(req, res, next)=>{
+	const id=req.params.reportId;
+	console.log(id);
+	try{
+	  const about_report = await report.findOne({
+		attributes:['content'],
+		where:{
+		 id:id
+		}
+	});
+	res.json(about_report);
+
+	 }catch(err){
+		console.error(err);
+		next(err);
+	}
+});
+//관리자에게 요청된 신고 목록 출력
+만드는중...
+router.post('',async(req,res,next)=>{
+  const {title, time ,reportId,category,commentId,sovled}=req.params;(??)
+  try{
+  const query= `SELECT * from report;`
+  const result=await sequelize.query(query,{
+    type: sequelize.QueryTypes.SELECT
+  });
+  res.send({
+    "reports":result
+  });
+
+   }catch(err){
+  console.error(err);
+}
+});
 module.exports = router;

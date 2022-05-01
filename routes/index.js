@@ -71,7 +71,7 @@ router.get('/purchased/novel', async (req, res, next) => {
         select *
         from novel, ownedContent
         where ownedContent.type = "novel"
-        and ownedContent.id = novel.id 
+        and ownedContent.id = novel.id
         and ownedContent.User_id = "${userId}"
         and own = 0;
         `;
@@ -98,8 +98,8 @@ router.get('/content/novel/:novelId/chapter/:chapterId', async (req, res, next) 
         const chapterFileName = await Chapter.findAll({
             attributes: ['chapterFileName'],
             where: {
-                chapterID: chapterId,
-                Novel_novelID: novelId
+                id: chapterId,//&chapterID->id
+                Novel_novelid: novelId//&Novel_novelID->Novel_id
             }
         });
         var _chapterFileName = chapterFileName[0].dataValues["chapterFileName"];
@@ -151,7 +151,7 @@ router.get('/comment/user/:novelId/:chapterId', async (req, res, next) => {
         const query = `
         select User.id as commentId, nickname, rating, content
         from User, UserComment
-        where User.id = UserComment.userId 
+        where User.id = UserComment.userId
         and Chapter_id = ${chapterId}
         and Chapter_Novel_id = ${novelId};
         `
