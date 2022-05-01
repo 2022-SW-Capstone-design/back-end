@@ -190,7 +190,7 @@ router.get('/list/music/:novelId/:chapterId', async(req,res,next)=>{
 
 //사용자가 챕터에 대한 음악을 업로드하면 저장소에 음악파일을 저장(연수 테스트 ok)
 router.post('/music', async (req, res, next )=> {
-  const{novelId, chapterId, music, userId, price}=req.body;
+  const {novelId, chapterId, music, userId, price} = req.body;
 
 //  Promise.all(music.map(async music1=> {
     try{
@@ -218,16 +218,19 @@ router.post('/music', async (req, res, next )=> {
 //사용자가 등록한 신고를 서버에 업로드(연수 테스트 ok)
 router.post('/upload', async(req,res,next)=>{
 	const{ userId, title, commentId, category, content }=req.body;
-  try{
+
+  try{//${userId}, ${category},${commentId},${content}, ${title}
 	const query=`
 	INSERT INTO report ( User_id,category, commentId,content,title,time,solved)
-  VALUES (${userId}, ${category},${commentId},${content}
-   ${title},NOW(),"0");`
+  VALUES (${userId}, ${category},${commentId},${content}, ${title},NOW(),"0");`
+   const result=await sequelize.query(query,{
+     type: sequelize.QueryTypes.INSERT
+  });
+res.json({"message" : "report upload success"});
   }catch(err){
 	console.error(err);
   next(err);
   }
-res.json({"message" : "report upload success"});
 });
 
 //신고 ID에 대한 신고내용 출력(연수 테스트 ok)
