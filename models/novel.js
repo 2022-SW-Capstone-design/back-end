@@ -29,7 +29,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     },
     coverFileName: {
-      type: DataTypes.STRING(45),
+      type: DataTypes.STRING(100),
       allowNull: true
     },
     defaultPrice: {

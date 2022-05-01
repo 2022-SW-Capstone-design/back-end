@@ -7,6 +7,7 @@ const development = {
   database : "novelend_db",
   host : env.DB_HOST,
   dialect : "mysql",
+  logging: false
 };
 
 const production = {

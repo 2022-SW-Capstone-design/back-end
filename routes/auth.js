@@ -90,7 +90,7 @@ router.post('/jwt', passport.authenticate('jwt', { session: false }),
 router.post('/google', async(req, res, next) => {
     try {
         const tokenId = req.body.googleTokenId;
-        console.log(tokenId);
+        // console.log(tokenId);
         const ticket = await client.verifyIdToken({
             idToken: tokenId,
             requiredAudience: process.env.GOOGLE_CLIENT_ID
@@ -126,10 +126,10 @@ router.post('/google', async(req, res, next) => {
         {
             expiresIn: '1h'
         });
-        
+
         res.json({
             "token" : token
-        });
+        }); 
         
     } catch(err) {
         console.log(err);

@@ -22,7 +22,7 @@ router.get('/test', verifyToken, async(req, res, next) => {
 //소설 요약정보 응답하기
 router.get('/info/novel/:novelId', async (req, res, next) => {
     const novelId = req.params.novelId;
-    console.log(`here, novelId : ${novelId}`);
+
     try {
         const novelInfo = await Novel.findOne({
             include: [{
@@ -42,19 +42,32 @@ router.get('/info/novel/:novelId', async (req, res, next) => {
 });
 
 // 직접 쓴 소설 가져오기
-router.get('/written/novel', async (req, res, next) => {
+router.get('/written/novel', verifyToken, async (req, res, next) => {
     // 임시로 유저아이디는 req.body에서 가져옴.
     const userId = req.body.userId;
+    console.log('written novel userId : ', userId);
     try {
-        const writtenNovels = await Novel.findAll({
+        await Novel.findAll({
+            raw: true,
             where: {
                 User_id: userId,
             }
-        });
-
-        res.send({
-            "novels": writtenNovels
-        });
+        }).then(async writtenNovels => {
+            if(writtenNovels) {
+                const nickname = await User.findOne({
+                    attributes: ["nickname"],
+                    where: {
+                        id : writtenNovels[0].User_id
+                    },
+                    raw: true,
+                });
+                writtenNovels.map(novel => {
+                    novel['nickname'] = nickname.nickname;
+                })
+            }
+            console.log('server result : ', writtenNovels);
+            res.json(writtenNovels);
+        })
 
     } catch (err) {
         console.log(err);
