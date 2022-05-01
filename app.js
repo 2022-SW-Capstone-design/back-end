@@ -15,6 +15,7 @@ const authRouter = require('./routes/auth');
 const uploadRouter = require('./routes/upload');
 const commentRouter = require('./routes/comment');
 const reportRouter = require('./routes/report');
+const likeRouter = require('./routes/like');
 
 const { sequelize } = require('./models');
 
@@ -48,6 +49,7 @@ app.use('/auth', authRouter);
 app.use('/upload', uploadRouter);
 app.use('/comment', commentRouter);
 app.use('/report', reportRouter);
+app.use('/like', likeRouter);
 
 // no router
 app.use((req, res, next) => {
