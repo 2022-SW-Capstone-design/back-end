@@ -66,12 +66,14 @@ router.post("/chapter", verifyToken, async (req, res, next) => {
       own: true
     });
     
-    current_chapterNumber = await Novel.findOne({
-      attributes:['chapterNumber'],
-      where: {
-        id: novelId
-      }
-    }).chapterNumber;
+	const temp = await Novel.findOne({
+		attributes:['chapterNumber'],
+		where: {
+		  id: novelId
+		},
+		raw: true
+	  });
+	  current_chapterNumber = await temp.chapterNumber;
 
     await Novel.update({
       chapterNumber: current_chapterNumber + 1
