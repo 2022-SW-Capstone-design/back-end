@@ -47,16 +47,23 @@ router.post("/chapter", verifyToken, async (req, res, next) => {
 			price
 		});
 
-		chapterId = await chapter.id;
-		fs.writeFileSync(
-			`./uploads/chapters/${chapterFileName}`,
-			content,
-			// { encoding: "utf8", flag: "wx" },
-			(err) => {
-				console.error(err);
-				next(err);
-			}
-		);
+    await OwnedContent.create({
+      User_id: userId,
+      type: 'chapter',
+      novelId,
+      chapterId,
+      contentId:null,
+      own: true
+    });
+    
+	const temp = await Novel.findOne({
+		attributes:['chapterNumber'],
+		where: {
+		  id: novelId
+		},
+		raw: true
+	  });
+	  current_chapterNumber = await temp.chapterNumber;
 
 		await OwnedContent.create({
 			User_id: userId,

@@ -11,7 +11,8 @@ const {
     Chapter,
     OwnedContent,
     UserComment,
-    sequelize
+    sequelize,
+    LikedContent
 } = require('../models');
 const CreateQuery = require('../testQueries.js');
 
@@ -33,7 +34,7 @@ router.get('/info/novel/:novelId', async (req, res, next) => {
                 id: novelId,
             }
         });
-
+        // console.log(novelInfo);
         res.send(novelInfo);
 
     } catch (err) {
@@ -170,8 +171,9 @@ router.get('/comment/user/:novelId/:chapterId', async (req, res, next) => {
     }
 });
 
-router.get('/list/novel/:novelId', async (req, res, next) => {
+router.get('/list/novel/:novelId', verifyToken, async (req, res, next) => {
     const novelId = req.params.novelId;
+    const userId = req.body.userId;
 
     try {
         const chapters = await Chapter.findAll({
@@ -180,7 +182,19 @@ router.get('/list/novel/:novelId', async (req, res, next) => {
             },
             raw: true
         });
-        res.json({"chatpers" : chapters});
+
+        await Promise.all(chapters.map(async chapter => {
+            const isPurchased = await OwnedContent.findOne({
+                where: {
+                    User_id: userId,
+                    type:'chapter',
+                    novelId: novelId,
+                    chapterId: chapter.id
+                }
+            });
+            chapter['isPurchased'] = isPurchased ? 1 : 0;
+        }));
+        res.json({"chapters" : chapters});
     } catch(err) {
         console.error(err);
         next(err);
