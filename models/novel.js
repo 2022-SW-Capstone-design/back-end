@@ -40,7 +40,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.FLOAT,
       allowNull: true
     },
-    chapterNumber: {
+    chapterNumber: { //챕터의 개수를 등록하는 attribute
       type: DataTypes.INTEGER,
       allowNull: true
     },
