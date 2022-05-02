@@ -130,14 +130,60 @@ router.get('/content/novel/:novelId/chapter/:chapterId', async (req, res, next) 
     }
 });
 
-router.get('/list/novel/:novelId', async (req, res, next) => {
-    const novelId = req.params.novelId;
+router.post('/comment/user', verifyToken, async (req, res, next) => {
+    const { chapterId, novelId, userId, rating, content } = req.body;
     try {
-        
-    } catch (err) {
-        console.log(err);
+        await UserComment.create({
+            Chapter_id : chapterId,
+            Chapter_Novel_id : novelId,
+            userId,
+            rating,
+            content
+        });
+
+    } catch(err) {
+        console.error(err);
+        next(err);
+    }
+    res.end();
+});
+
+router.get('/comment/user/:novelId/:chapterId', async (req, res, next) => {
+    const { novelId, chapterId } = req.params;
+    try {
+        const query = `
+        select User.id as commentId, nickname, rating, content
+        from User, UserComment
+        where User.id = UserComment.userId
+        and Chapter_id = ${chapterId}
+        and Chapter_Novel_id = ${novelId};
+        `
+        await sequelize.query(query, {
+            type: sequelize.QueryTypes.SELECT
+        }).then(result => {
+            res.json({'comments' : result});
+        });
+    } catch(err) {
+        console.error(err);
+        next(err);
     }
 });
 
+router.get('/list/novel/:novelId', async (req, res, next) => {
+    const novelId = req.params.novelId;
+
+    try {
+        const chapters = await Chapter.findAll({
+            where:{
+                Novel_id: novelId
+            },
+            raw: true
+        });
+        res.json({"chatpers" : chapters});
+    } catch(err) {
+        console.error(err);
+        next(err);
+    }
+});
 
 module.exports = router;
