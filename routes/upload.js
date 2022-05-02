@@ -32,59 +32,60 @@ const {
 
 // 챕터 내용 파일 생성 및 챕터 추가
 router.post("/chapter", verifyToken, async (req, res, next) => {
-  const { title, novelId, price, content } = req.body;
-  const userId = req.body.userId;
-  let chapterId = 0, current_chapterNumber = 0;
-  console.log('server upload chapter novelId :', novelId);
+	const { title, novelId, price, content } = req.body;
+	const userId = req.body.userId;
+	//const userId = 'john123@ajou.ac.kr';
+	let chapterId = 0, current_chapterNumber = 0;
+	console.log('server upload chapter novelId :', novelId);
 
 	try {
-    const chapterFileName = uuid4();
+		const chapterFileName = uuid4();
 		const chapter = await Chapter.create({
 			Novel_id: novelId,
-      title,
-      fileName: chapterFileName,
-      price
+			title,
+			fileName: chapterFileName,
+			price
 		});
-    
-    chapterId = await chapter.id;
-    fs.writeFileSync(
-      `./uploads/chapters/${chapterFileName}`,
-      content,
-      // { encoding: "utf8", flag: "wx" },
-      (err) => {
-        console.error(err);
-        next(err);
-      }
-    );
 
-    await OwnedContent.create({
-      User_id: userId,
-      type: 'chapter',
-      novelId,
-      chapterId,
-      contentId:null,
-      own: true
-    });
-    
-    current_chapterNumber = await Novel.findOne({
-      attributes:['chapterNumber'],
-      where: {
-        id: novelId
-      }
-    }).chapterNumber;
+		chapterId = await chapter.id;
+		fs.writeFileSync(
+			`./uploads/chapters/${chapterFileName}`,
+			content,
+			// { encoding: "utf8", flag: "wx" },
+			(err) => {
+				console.error(err);
+				next(err);
+			}
+		);
 
-    await Novel.update({
-      chapterNumber: current_chapterNumber + 1
-    }, {
-      where: {
-        id : novelId
-      }
-    });
-  } catch(err) {
-    console.error(err);
-    next(err);
-  }
-  res.end();
+		await OwnedContent.create({
+			User_id: userId,
+			type: 'chapter',
+			novelId,
+			chapterId,
+			contentId: null,
+			own: true
+		});
+
+		current_chapterNumber = await Novel.findOne({
+			attributes: ['chapterNumber'],
+			where: {
+				id: novelId
+			}
+		}).chapterNumber;
+
+		await Novel.update({
+			chapterNumber: current_chapterNumber + 1
+		}, {
+			where: {
+				id: novelId
+			}
+		});
+	} catch (err) {
+		console.error(err);
+		next(err);
+	}
+	res.end();
 });
 
 // 소설 업로드
@@ -97,24 +98,24 @@ router.post("/novel", verifyToken, async (req, res, next) => {
 	const temp = JSON.parse(coverImage).src;
 	console.log("temp:", temp);
 	try {
-    const nickname = await User.findOne({
-        attributes: ["nickname"],
-        where: {
-            id : userId
-        },
-        raw: true,
-    });
+		const nickname = await User.findOne({
+			attributes: ["nickname"],
+			where: {
+				id: userId
+			},
+			raw: true,
+		});
 
 		await Novel.create({
 			User_id: userId,
-      nickname: nickname.nickname,
+			nickname: nickname.nickname,
 			title,
 			description,
 			genre,
 			coverFileName: temp,
 			defaultPrice,
 			rating: 0,
-      chapterNumber: 0
+			chapterNumber: 0
 		});
 	} catch (err) {
 		console.log(err);

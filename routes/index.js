@@ -108,17 +108,18 @@ router.get('/content/novel/:novelId/chapter/:chapterId', async (req, res, next) 
     // 임시로 유저아이디는 req.body에서 가져옴.
     const novelId = req.params.novelId;
     const chapterId = req.params.chapterId;
-    console.log(novelId, chapterId);
+
     try {
         const chapterFileName = await Chapter.findAll({
-            attributes: ['chapterFileName'],
+            attributes: ['fileName'],
             where: {
                 id: chapterId,//&chapterID->id
-                Novel_novelid: novelId//&Novel_novelID->Novel_id
+                Novel_id: novelId//&Novel_novelID->Novel_id
             }
         });
-        var _chapterFileName = chapterFileName[0].dataValues["chapterFileName"];
-        fs.readFile(`./chapters/${_chapterFileName}`, "utf8", (err, contentFile) => {
+        //console.log(chapterFileName[0]);
+        var _chapterFileName = chapterFileName[0].dataValues["fileName"];
+        fs.readFile(`./uploads/chapters/${_chapterFileName}`, "utf8", (err, contentFile) => {
             try {
                 res.send(contentFile);
             } catch (err) {
