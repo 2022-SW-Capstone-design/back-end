@@ -42,6 +42,14 @@ module.exports = function(sequelize, DataTypes) {
     likes: {
       type: DataTypes.INTEGER,
       allowNull: true
+    },
+    set: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    nickname: {
+      type: DataTypes.STRING(45),
+      allowNull: true
     }
   }, {
     sequelize,

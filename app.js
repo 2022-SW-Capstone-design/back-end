@@ -2,12 +2,10 @@
 const express = require('express');
 const path = require('path');
 const morgan = require('morgan');
-const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const passport = require('passport');
 const passportConfig = require('./passport');
-const formidable = require('express-formidable');
 
 dotenv.config();
 const indexRouter = require('./routes/index');
@@ -40,7 +38,6 @@ app.use(express.static(path.join(__dirname, './uploads')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use('/illust', express.static(path.join(__dirname, '/uploads/illusts')));
-// app.use(formidable()); //postman error
 app.use(passport.initialize());
  
 // router 핸들링
