@@ -40,6 +40,7 @@ app.use(express.static(path.join(__dirname, './uploads')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use('/illust', express.static(path.join(__dirname, '/uploads/illusts')));
+app.use('/music', express.static(path.join(__dirname, '/uploads/music')));
 // app.use(formidable()); //postman error
 app.use(passport.initialize());
  

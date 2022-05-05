@@ -267,28 +267,5 @@ router.get("/list/music/:novelId/:chapterId", async (req, res, next) => {
 	}
 });
 
-//사용자가 챕터에 대한 음악을 업로드하면 저장소에 음악파일을 저장(연수 테스트 ok)
-router.post("/music", async (req, res, next) => {
-	const { novelId, chapterId, music, userId, price } = req.body;
-
-	//  Promise.all(music.map(async music1=> {
-	try {
-		const { musicFile } = music1;
-		console.log(`musicFile:${musicFile}`);
-		await music.create({
-			Chapter_id: chapterId, //&
-			Chapter_Novel_id: novelId, //&
-			userId,
-			price,
-			fileName: musicFile,
-			likes: 0,
-		});
-	} catch (err) {
-		console.error(err);
-		next(err);
-	}
-	//  }));
-	res.json({ message: "music upload success" });
-});
 
 module.exports = router;
