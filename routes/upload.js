@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
+var upload = multer({ dest: 'uploads/' })
 const path = require("path");
 const fs = require("fs");
 const uuid4 = require("uuid4");
@@ -13,6 +14,7 @@ const {
 	Chapter,
 	OwnedContent,
 	sequelize,
+	Music,
 	Report,
 } = require("../models");
 
@@ -47,23 +49,23 @@ router.post("/chapter", verifyToken, async (req, res, next) => {
 			price
 		});
 
-    await OwnedContent.create({
-      User_id: userId,
-      type: 'chapter',
-      novelId,
-      chapterId,
-      contentId:null,
-      own: true
-    });
-    
-	const temp = await Novel.findOne({
-		attributes:['chapterNumber'],
-		where: {
-		  id: novelId
-		},
-		raw: true
-	  });
-	  current_chapterNumber = await temp.chapterNumber;
+		await OwnedContent.create({
+			User_id: userId,
+			type: 'chapter',
+			novelId,
+			chapterId,
+			contentId: null,
+			own: true
+		});
+
+		const temp = await Novel.findOne({
+			attributes: ['chapterNumber'],
+			where: {
+				id: novelId
+			},
+			raw: true
+		});
+		current_chapterNumber = await temp.chapterNumber;
 
 		await OwnedContent.create({
 			User_id: userId,
@@ -177,16 +179,61 @@ router.post("/illust", async (req, res, next) => {
 	res.json({ message: "illust upload success" });
 });
 
+// 서버 저장소에 음악 파일을 저장하고 url을 리턴하는 api
+router.post("/music-file", upload.single('musicFile'), async (req, res, next) => {
+	try {
+		const fileId = uuid4();
+		fs.rename(
+			path.join(__dirname, `../${req.file.path}`),
+			path.join(__dirname, `../uploads/music/${fileId}.mp3`),
+			(err) => {
+				if (err) throw err;
+			}
+		);
+		return res.json({
+			url: `http://localhost:8081/music/${fileId}.png`,
+		});
+	} catch (err) {
+		console.error(err);
+		next(err);
+	}
+});
+
+
+//음악 파일을 
+router.post("/music", async (req, res, next) => {
+	const { novelId, chapterId, musicURL, price } = req.body;
+	//const userId = req.body.userId;
+	const userId = "john123@ajou.ac.kr"
+
+	try {
+		//console.log(`url : ${url}, index : ${index}`);
+		await Music.create({
+			Chapter_id: chapterId,
+			Chapter_Novel_id: novelId,
+			userId,
+			price,
+			fileName: musicURL,
+			likes: 0,
+		});
+		return res.send("music upload success");
+	} catch (err) {
+		console.error(err);
+		next(err);
+	}
+
+});
+
 //사용자가 해당 챕터에 대해 구매한 음악의 목록 응답 (연수 테스트ok)
 router.get("/purchased/music/:novelId/:chapterId", async (req, res, next) => {
 	const novelId = req.params.novelId;
 	const chapterId = req.params.chapterId;
 	try {
 		const query = `
-    SELECT filename from music
-      WHERE (Chapter_Novel_id=${novelId} and Chapter_id=${chapterId}) in(
-  	     SELECT filename from Ownedcontent
-     	   where (chapterId=${chapterId} and novelId=${novelId} ));`;
+    		SELECT filename from music
+      		WHERE (Chapter_Novel_id=${novelId} and Chapter_id=${chapterId}) in(
+  	     	SELECT filename from Ownedcontent
+     	   	where (chapterId=${chapterId} and novelId=${novelId} ));`;
 		const result = await sequelize.query(query, {
 			type: sequelize.QueryTypes.SELECT,
 		});
@@ -242,41 +289,6 @@ router.post("/music", async (req, res, next) => {
 	}
 	//  }));
 	res.json({ message: "music upload success" });
-});
-
-// 리포트 쪽으로 옮겨주어야하는 코드들
-
-//사용자가 등록한 신고를 서버에 업로드(연수 테스트 ok)
-router.post("/upload", async (req, res, next) => {
-	const { userId, title, commentId, category, content } = req.body;
-	try {
-		const query = `
-	INSERT INTO report ( User_id,category, commentId,content,title,time,solved)
-  VALUES (${userId}, ${category},${commentId},${content}
-   ${title},NOW(),"0");`;
-	} catch (err) {
-		console.error(err);
-		next(err);
-	}
-	res.json({ message: "report upload success" });
-});
-
-//신고 ID에 대한 신고내용 출력(연수 테스트 ok)
-router.get("/report/content/:reportId", async (req, res, next) => {
-	const id = req.params.reportId;
-	console.log(id);
-	try {
-		const about_report = await report.findOne({
-			attributes: ["content"],
-			where: {
-				id: id,
-			},
-		});
-		res.json(about_report);
-	} catch (err) {
-		console.error(err);
-		next(err);
-	}
 });
 
 module.exports = router;
