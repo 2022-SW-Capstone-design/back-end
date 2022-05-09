@@ -147,11 +147,10 @@ router.get('/purchased/music/:novelId/:chapterId',async(req,res,next)=>{
     const novelId=req.params.novelId;
     const chapterId=req.params.chapterId;
     try{
-    const query=`
-    SELECT filename from music
-      WHERE (Chapter_Novel_id=${novelId} and Chapter_id=${chapterId}) in(
-  	     SELECT filename from Ownedcontent
-     	   where (chapterId=${chapterId} and novelId=${novelId} ));`
+      const query=`SELECT * from music
+            WHERE (Chapter_Novel_id=${novelId} and Chapter_id=${chapterId}) and filename in(
+        	     SELECT filename from Ownedcontent
+           	   where (chapterId=${chapterId} and novelId=${chapterId} ));`
          const result=await sequelize.query(query,{
            type: sequelize.QueryTypes.SELECT
       });
@@ -170,11 +169,10 @@ router.get('/list/music/:novelId/:chapterId', async(req,res,next)=>{
   const chapterId=req.params.chapterId;
 
   try{
-  const query=`
-  SELECT filename from music
-    WHERE (Chapter_Novel_id=${novelId} and Chapter_id=${chapterId}) not in(
-	     SELECT filename from Ownedcontent
-   	   where (chapterId=${chapterId} and novelId=${novelId} ));`
+  const query=`SELECT filename from music
+        WHERE (Chapter_Novel_id=${novelId} and Chapter_id=${chapterId}) and filename not in(
+    	     SELECT filename from Ownedcontent
+       	   where (chapterId=${chapterId} and novelId=${chapterId} ));`
        const result=await sequelize.query(query,{
          type: sequelize.QueryTypes.SELECT
     });

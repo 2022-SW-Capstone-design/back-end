@@ -19,59 +19,39 @@ router.get('/test', verifyToken, async(req, res, next) => {
     res.send(`test success. id : ${req.body.userId}`);
 })
 
-//소설 요약정보 응답하기
+//소설 요약정보 응답하기 (연수 테스트 ok)
 router.get('/info/novel/:novelId', async (req, res, next) => {
     const novelId = req.params.novelId;
 
     try {
-        const novelInfo = await Novel.findOne({
-            include: [{
-                model: Chapter,
-                as: 'chapters'
-            }],
-            where: {
-                id: novelId,
-            }
-        });
-
-        res.send(novelInfo);
-
-    } catch (err) {
-        console.log(err);
+      const query=`select description from novel
+      where id=${novelId};`
+      const result=await sequelize.query(query,{
+        type: sequelize.QueryTypes.SELECT
+      });
+      res.send({
+        "description":result
+      });
+    }catch(err){
+      console.error(err);
     }
-});
+  });
 
-// 직접 쓴 소설 가져오기
-router.get('/written/novel', verifyToken, async (req, res, next) => {
+// 직접 쓴 소설 가져오기(연수 테스트 ok)
+router.get('/written/novel', async (req, res, next) => {
     // 임시로 유저아이디는 req.body에서 가져옴.
     const userId = req.body.userId;
-    console.log('written novel userId : ', userId);
-    try {
-        await Novel.findAll({
-            raw: true,
-            where: {
-                User_id: userId,
-            }
-        }).then(async writtenNovels => {
-            if(writtenNovels) {
-                const nickname = await User.findOne({
-                    attributes: ["nickname"],
-                    where: {
-                        id : writtenNovels[0].User_id
-                    },
-                    raw: true,
-                });
-                writtenNovels.map(novel => {
-                    novel['nickname'] = nickname.nickname;
-                })
-            }
-            console.log('server result : ', writtenNovels);
-            res.json(writtenNovels);
-        })
-
-    } catch (err) {
-        console.log(err);
-    }
+      try {
+          const query=`SELECT title from novel where User_id= ${userId};`
+          const result=await sequelize.query(query,{
+            type: sequelize.QueryTypes.SELECT
+          });
+          res.send({
+            "Title":result
+          });
+        }catch(err){
+          console.error(err);
+        }
 });
 
 // 구매한 소설 가져오기
