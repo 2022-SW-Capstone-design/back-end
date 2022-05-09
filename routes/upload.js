@@ -206,7 +206,8 @@ router.post("/illust", verifyToken, async (req, res, next) => {
 });
 
 // 서버 저장소에 음악 파일을 저장하고 url을 리턴하는 api
-router.post("/music-file", upload.single('musicFile'), async (req, res, next) => {
+// upload.single('musicFile') -> multer 미들웨어 설정 필요
+router.post("/music-file", async (req, res, next) => {
 	try {
 		const fileId = uuid4();
 		fs.rename(
