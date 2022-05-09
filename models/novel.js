@@ -39,6 +39,14 @@ module.exports = function(sequelize, DataTypes) {
     rating: {
       type: DataTypes.FLOAT,
       allowNull: true
+    },
+    chapterNumber: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    nickname: {
+      type: DataTypes.STRING(45),
+      allowNull: true
     }
   }, {
     sequelize,

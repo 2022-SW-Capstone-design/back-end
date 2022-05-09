@@ -11,9 +11,13 @@ const {
     Chapter,
     OwnedContent,
     UserComment,
-    sequelize
+    Illust,
+    sequelize,
+    Sequelize,
+    LikedContent
 } = require('../models');
 const CreateQuery = require('../testQueries.js');
+const Op = Sequelize.Op;
 
 router.get('/test', verifyToken, async(req, res, next) => {
     res.send(`test success. id : ${req.body.userId}`);
@@ -24,16 +28,21 @@ router.get('/info/novel/:novelId', async (req, res, next) => {
     const novelId = req.params.novelId;
 
     try {
-      const query=`select description from novel
-      where id=${novelId};`
-      const result=await sequelize.query(query,{
-        type: sequelize.QueryTypes.SELECT
-      });
-      res.send({
-        "description":result
-      });
-    }catch(err){
-      console.error(err);
+        const novelInfo = await Novel.findOne({
+            include: [{
+                model: Chapter,
+                as: 'chapters'
+            }],
+            where: {
+                id: novelId,
+            }
+        });
+        // console.log(novelInfo);
+        res.send(novelInfo);
+
+    } catch (err) {
+        console.log(err);
+        next(err);
     }
   });
 
@@ -41,17 +50,19 @@ router.get('/info/novel/:novelId', async (req, res, next) => {
 router.get('/written/novel', async (req, res, next) => {
     // 임시로 유저아이디는 req.body에서 가져옴.
     const userId = req.body.userId;
-      try {
-          const query=`SELECT title from novel where User_id= ${userId};`
-          const result=await sequelize.query(query,{
-            type: sequelize.QueryTypes.SELECT
-          });
-          res.send({
-            "Title":result
-          });
-        }catch(err){
-          console.error(err);
-        }
+    console.log('written novel userId : ', userId);
+    try {
+        const writtenNovels = await Novel.findAll({
+            raw: true,
+            where: {
+                User_id: userId,
+            }
+        });
+        res.json(writtenNovels);
+    } catch (err) {
+        console.log(err);
+        next(err);
+    }
 });
 
 // 구매한 소설 가져오기
@@ -80,32 +91,215 @@ router.get('/purchased/novel', async (req, res, next) => {
         console.log(err);
     }
 });
-//---------------------------------------------------------------------------------------------
-// 챕터의 content file 리턴
+
+
+const insertAt = (str, sub, pos) => `${str.slice(0, pos)}${sub}${str.slice(pos)}`;
+// 컨텐츠 구매여부 파악 후 챕터의 내용 리턴
 router.get('/content/novel/:novelId/chapter/:chapterId', async (req, res, next) => {
-    // 임시로 유저아이디는 req.body에서 가져옴.
-    const novelId = req.params.novelId;
-    const chapterId = req.params.chapterId;
-    console.log(novelId, chapterId);
+    const { novelId, chapterId } = req.params;
+    const { illustSet } = req.query;
+    // const userId = req.body.userId;
+
     try {
-        const chapterFileName = await Chapter.findAll({
-            attributes: ['chapterFileName'],
+        // const owned = await OwnedContent.findOne({
+        //     attributes:['own'],
+        //     where:{
+        //         User_id: userId,
+        //         type: 'chapter',
+        //         novelId: novelId,
+        //         chapterId: chapterId
+        //     }
+        // });
+        // if(!owned) {
+        //     res.status(403).json({"message" : "구매하지 않은 챕터입니다."});
+        // }
+
+
+        const chapter = await Chapter.findOne({
+            attributes: ['fileName'],
             where: {
-                id: chapterId,//&chapterID->id
-                Novel_novelid: novelId//&Novel_novelID->Novel_id
+                Novel_id: novelId,
+                id: chapterId,
             }
         });
-        var _chapterFileName = chapterFileName[0].dataValues["chapterFileName"];
-        fs.readFile(`./chapters/${_chapterFileName}`, "utf8", (err, contentFile) => {
-            try {
-                res.send(contentFile);
-            } catch (err) {
-                console.log(err);
-            }
-        });
+        const url = path.join(__dirname, '../uploads/chapters',await chapter.fileName);
+        let content = fs.readFileSync(url, {encoding:'utf-8'});
+
+        if(illustSet) {
+            console.log('illust set :', illustSet);
+
+            // const owned = await OwnedContent.findOne({
+            //     attributes:['own'],
+            //     where:{
+            //         User_id: userId,
+            //         type: 'illust',
+            //         novelId: novelId,
+            //         chapterId: chapterId,
+            //         contentId: illustSet
+            //     }
+            // });
+            // if(!owned) {
+            //     res.status(403).json({"message" : "구매하지 않은 일러스트 세트 입니다."});
+            // }
+
+            const illusts = await Illust.findAll({
+                where: {
+                    Chapter_Novel_id: novelId,
+                    Chapter_id: chapterId,
+                    set: illustSet
+                },
+                raw: true
+            });
+
+            illusts.map(illust => {
+                const { fileName:url, index } = illust;
+                content = insertAt(content, url, index);
+                console.log('illust inserted at index :', index);
+            })
+        }
+
+        return res.json({'chapterContent' : content});
+
     } catch (err) {
         console.log(err);
     }
+});
+
+// 소설 검색
+router.get('/search/novel', async (req, res, next) => {
+    const { type, keyword } = req.query;
+    console.log('keyword :',keyword);
+    if(type == 'title') {
+        const novels = await Novel.findAll({
+            where:{
+                title: {
+                    [Op.like]: "%"+keyword+"%"
+                }
+            },
+            raw: true
+        });
+        // console.log('search novel result:', novels);
+        res.json({'novels' : novels});
+    }
+    else if(type == 'author') {
+        const novels = await Novel.findAll({
+            where:{
+                nickname: {
+                    [Op.like]: "%"+keyword+"%"
+                }
+            },
+            raw: true
+        });
+        // console.log('search novel result:', novels);
+        res.json({'novels' : novels});
+    }
+    else {
+        res.status(403).json({"message" : "검색 타입 지정 안됨."});
+    }
+});
+
+router.post('/comment/user', verifyToken, async (req, res, next) => {
+    const { chapterId, novelId, userId, rating, content } = req.body;
+    try {
+        await UserComment.create({
+            Chapter_id : chapterId,
+            Chapter_Novel_id : novelId,
+            userId,
+            rating,
+            content
+        });
+
+    } catch(err) {
+        console.error(err);
+        next(err);
+    }
+    res.end();
+});
+
+router.get('/comment/user/:novelId/:chapterId', async (req, res, next) => {
+    const { novelId, chapterId } = req.params;
+    try {
+        const query = `
+        select User.id as commentId, nickname, rating, content
+        from User, UserComment
+        where User.id = UserComment.userId
+        and Chapter_id = ${chapterId}
+        and Chapter_Novel_id = ${novelId};
+        `
+        await sequelize.query(query, {
+            type: sequelize.QueryTypes.SELECT
+        }).then(result => {
+            res.json({'comments' : result});
+        });
+    } catch(err) {
+        console.error(err);
+        next(err);
+    }
+});
+
+// 소설의 챕터목록 리턴
+router.get('/list/novel/:novelId', verifyToken, async (req, res, next) => {
+    const novelId = req.params.novelId;
+    const userId = req.body.userId;
+
+    try {
+        const chapters = await Chapter.findAll({
+            where:{
+                Novel_id: novelId
+            },
+            raw: true
+        });
+
+        await Promise.all(chapters.map(async chapter => {
+            const isPurchased = await OwnedContent.findOne({
+                where: {
+                    User_id: userId,
+                    type:'chapter',
+                    novelId: novelId,
+                    chapterId: chapter.id
+                }
+            });
+            chapter['isPurchased'] = isPurchased ? 1 : 0;
+        }));
+        res.json({"chapters" : chapters});
+    } catch(err) {
+        console.error(err);
+        next(err);
+    }
+});
+
+// 챕터의 일러스트 목록 리턴
+router.get('/list/illust/:novelId/:chapterId', async (req, res, next) => {
+    const { novelId, chapterId } = req.params;
+
+    const result = await Illust.findAll({
+        attributes:['id'],
+        where: {
+            Chapter_Novel_id: novelId,
+            Chapter_id: chapterId
+        },
+        raw:true,
+        group: ['set']
+    });
+    const firstIds = result.map(id => id.id);
+
+    const firsts = await Illust.findAll({
+        attributes:[['set', 'illustSetId'], ['fileName', 'coverURL'], 'nickname', 'price'],
+        where:{
+            id: {
+                [Op.in]: firstIds
+            }
+        },
+        raw:true
+    });
+    /// isLiked, isPurchased 추가해야함
+
+
+
+    console.log('illust set list :', firsts);
+    res.json(firsts);
+
+
 });
 
 module.exports = router;

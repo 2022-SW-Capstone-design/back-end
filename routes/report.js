@@ -36,5 +36,50 @@ router.get('/content/:reportId', async (req, res, next) => {
     }
 });
 
+router.get('/list', async (req, res, next) => {
 
+    if (req.query.page == undefined) {
+        var page = 1
+    } else {
+        var page = Number(req.query.page);
+    }
+
+    if (req.query.each == undefined) {
+        var each = 10
+    } else {
+        var each = Number(req.query.each);
+    }
+
+    if (req.query.category == 'comment') {
+        var category = "댓글";
+    } else if (req.query.category == 'novel') {
+        var category = "소설";
+    } else {
+        var category = ["소설", "댓글"];
+    }
+
+    if (req.query.sorted == 'old') {
+        var sorted = 'asc'
+    } else if (req.query.sorted == 'new') {
+        var sorted = 'desc'
+    } else if (req.query.sorted == undefined) {
+        var sorted = 'desc'
+    }
+
+    try {
+        var comment = await Report.findAll({
+            where: { 
+                solved: 0,
+                category: category
+            },
+            order: [['id', sorted]],
+            limit: each,
+            offset: each * (page - 1)
+        })
+        res.send(comment);
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
+})
 module.exports = router;
