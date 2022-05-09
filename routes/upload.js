@@ -227,10 +227,10 @@ router.post("/music-file", upload.single('musicFile'), async (req, res, next) =>
 
 
 //음악 파일을 
-router.post("/music", async (req, res, next) => {
+router.post("/music", verifyToken, async (req, res, next) => {
 	const { novelId, chapterId, musicURL, price } = req.body;
-	//const userId = req.body.userId;
-	const userId = "john123@ajou.ac.kr"
+	const userId = req.body.userId;
+	//const userId = "john123@ajou.ac.kr"
 
 	try {
 		//console.log(`url : ${url}, index : ${index}`);
