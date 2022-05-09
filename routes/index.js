@@ -92,6 +92,10 @@ router.get('/purchased/novel', async (req, res, next) => {
     }
 });
 
+router.get('/purchased/illust', async (req, res, next) => {
+
+});
+
 
 const insertAt = (str, sub, pos) => `${str.slice(0, pos)}${sub}${str.slice(pos)}`;
 // 컨텐츠 구매여부 파악 후 챕터의 내용 리턴
@@ -124,7 +128,6 @@ router.get('/content/novel/:novelId/chapter/:chapterId', async (req, res, next) 
         });
         const url = path.join(__dirname, '../uploads/chapters',await chapter.fileName);
         let content = fs.readFileSync(url, {encoding:'utf-8'});
-
         if(illustSet) {
             console.log('illust set :', illustSet);
 
@@ -151,13 +154,18 @@ router.get('/content/novel/:novelId/chapter/:chapterId', async (req, res, next) 
                 raw: true
             });
 
+            let pad = 0;
             illusts.map(illust => {
                 const { fileName:url, index } = illust;
-                content = insertAt(content, url, index);
-                console.log('illust inserted at index :', index);
+                const md_url = '<br>![alt text]('+url+')';
+                
+                content = insertAt(content, md_url, index+pad);
+                // console.log('illust inserted at index :', index);
+                pad += 3;
             })
+            content.replace('\n','<br>');
         }
-
+        
         return res.json({'chapterContent' : content});
 
     } catch (err) {
