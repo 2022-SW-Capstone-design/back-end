@@ -7,6 +7,7 @@ const uuid4 = require("uuid4");
 const { verifyToken } = require("./middlewares");
 const formidable = require('express-formidable');
 const mv = require('mv');
+
 const upload = multer({
 	dest: 'uploads/'
 })
@@ -210,7 +211,7 @@ router.post("/illust", verifyToken, async (req, res, next) => {
 
 // 서버 저장소에 음악 파일을 저장하고 url을 리턴하는 api
 // upload.single('musicFile') -> multer 미들웨어 설정 필요
-router.post("/music-file", async (req, res, next) => {
+router.post("/music-file", upload.single('musicFile'), async (req, res, next) => {
 	try {
 		const fileId = uuid4();
 		fs.rename(
