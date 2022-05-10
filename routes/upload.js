@@ -1,12 +1,15 @@
 const express = require("express");
 const router = express.Router();
-// const multer = require("multer");
+const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const uuid4 = require("uuid4");
 const { verifyToken } = require("./middlewares");
 const formidable = require('express-formidable');
 const mv = require('mv');
+const upload = multer({
+	dest: 'uploads/'
+})
 
 const {
 	User,
@@ -218,7 +221,7 @@ router.post("/music-file", async (req, res, next) => {
 			}
 		);
 		return res.json({
-			url: `http://localhost:8081/music/${fileId}.png`,
+			url: `http://localhost:8081/music/${fileId}.mp3`,
 		});
 	} catch (err) {
 		console.error(err);
@@ -231,7 +234,7 @@ router.post("/music-file", async (req, res, next) => {
 router.post("/music", verifyToken, async (req, res, next) => {
 	const { novelId, chapterId, musicURL, price } = req.body;
 	const userId = req.body.userId;
-	//const userId = "john123@ajou.ac.kr"
+	//const userId = "mike123@ajou.ac.kr"
 
 	try {
 		//console.log(`url : ${url}, index : ${index}`);
@@ -257,7 +260,7 @@ router.get("/purchased/music/:novelId/:chapterId", async (req, res, next) => {
 	const chapterId = req.params.chapterId;
 	try {
 		const query = `
-    		SELECT filename from music
+    		SELECT * from music
       		WHERE (Chapter_Novel_id=${novelId} and Chapter_id=${chapterId}) in(
   	     	SELECT filename from Ownedcontent
      	   	where (chapterId=${chapterId} and novelId=${novelId} ));`;

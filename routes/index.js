@@ -66,7 +66,7 @@ router.get('/written/novel', async (req, res, next) => {
 });
 
 // 구매한 소설 가져오기
-router.get('/purchased/novel', async (req, res, next) => {
+router.get('/purchased/novel', verifyToken, async (req, res, next) => {
     // 임시로 유저아이디는 req.body에서 가져옴.
     const userId = req.body.userId;
     try {
