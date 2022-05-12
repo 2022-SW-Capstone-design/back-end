@@ -160,11 +160,11 @@ router.get('/content/novel/:novelId/chapter/:chapterId', async (req, res, next) 
             let pad = 0;
             illusts.map(illust => {
                 const { fileName:url, index } = illust;
-                const md_url = '<br>![alt text]('+url+')<br>';
+                const md_url = '\n![alt text]('+url+')\n';
                 
                 content = insertAt(content, md_url, index+pad);
                 // console.log('illust inserted at index :', index);
-                pad += 7;
+                pad += 4;
             });
         }
 
