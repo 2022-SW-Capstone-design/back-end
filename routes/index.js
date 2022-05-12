@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const fs = require('fs');
-const { v4 : uuidv4 } = require('uuid');
 const { verifyToken } = require('./middlewares');
 
 const {
@@ -12,6 +11,7 @@ const {
     OwnedContent,
     UserComment,
     Illust,
+    Music,
     sequelize,
     Sequelize,
     LikedContent
@@ -47,7 +47,7 @@ router.get('/info/novel/:novelId', async (req, res, next) => {
   });
 
 // 직접 쓴 소설 가져오기(연수 테스트 ok)
-router.get('/written/novel', async (req, res, next) => {
+router.get('/written/novel', verifyToken, async (req, res, next) => {
     // 임시로 유저아이디는 req.body에서 가져옴.
     const userId = req.body.userId;
     console.log('written novel userId : ', userId);
@@ -58,6 +58,7 @@ router.get('/written/novel', async (req, res, next) => {
                 User_id: userId,
             }
         });
+        // console.log('written novels :', writtenNovels);
         res.json(writtenNovels);
     } catch (err) {
         console.log(err);
@@ -66,7 +67,7 @@ router.get('/written/novel', async (req, res, next) => {
 });
 
 // 구매한 소설 가져오기
-router.get('/purchased/novel', async (req, res, next) => {
+router.get('/purchased/novel', verifyToken, async (req, res, next) => {
     // 임시로 유저아이디는 req.body에서 가져옴.
     const userId = req.body.userId;
     try {
@@ -92,12 +93,16 @@ router.get('/purchased/novel', async (req, res, next) => {
     }
 });
 
+router.get('/purchased/illust', async (req, res, next) => {
+
+});
+
 
 const insertAt = (str, sub, pos) => `${str.slice(0, pos)}${sub}${str.slice(pos)}`;
 // 컨텐츠 구매여부 파악 후 챕터의 내용 리턴
 router.get('/content/novel/:novelId/chapter/:chapterId', async (req, res, next) => {
     const { novelId, chapterId } = req.params;
-    const { illustSet } = req.query;
+    const { illustSet, musicSet } = req.query;
     // const userId = req.body.userId;
 
     try {
@@ -123,10 +128,11 @@ router.get('/content/novel/:novelId/chapter/:chapterId', async (req, res, next) 
             }
         });
         const url = path.join(__dirname, '../uploads/chapters',await chapter.fileName);
-        let content = fs.readFileSync(url, {encoding:'utf-8'});
-
+        let content = fs.readFileSync(url, {encoding:'utf-8'}).toString();
+        let tracks = {};
+        // console.log('content:',content);
         if(illustSet) {
-            console.log('illust set :', illustSet);
+            // console.log('illust set :', illustSet);
 
             // const owned = await OwnedContent.findOne({
             //     attributes:['own'],
@@ -151,14 +157,34 @@ router.get('/content/novel/:novelId/chapter/:chapterId', async (req, res, next) 
                 raw: true
             });
 
+            let pad = 0;
             illusts.map(illust => {
                 const { fileName:url, index } = illust;
-                content = insertAt(content, url, index);
-                console.log('illust inserted at index :', index);
-            })
+                const md_url = '<br>![alt text]('+url+')<br>';
+                
+                content = insertAt(content, md_url, index+pad);
+                // console.log('illust inserted at index :', index);
+                pad += 7;
+            });
         }
 
-        return res.json({'chapterContent' : content});
+        if (musicSet) {
+            tracks = await Music.findAll({
+                attributes:[['fileName', 'url']],
+                where: {
+                    Chapter_Novel_id: novelId,
+                    Chapter_id: chapterId,
+                    set: musicSet
+                },
+                raw: true
+            });
+        }
+        // content = content.replace('\\n', '<br>');
+        // console.log('after content:', content);
+        return res.json({
+            'chapterContent' : content,
+            'musicTracks' : tracks
+        });
 
     } catch (err) {
         console.log(err);
@@ -268,7 +294,7 @@ router.get('/list/novel/:novelId', verifyToken, async (req, res, next) => {
     }
 });
 
-// 챕터의 일러스트 목록 리턴
+// 챕터의 일러스트 세트 목록(각 세트의 첫 일러스트 목록) 리턴
 router.get('/list/illust/:novelId/:chapterId', async (req, res, next) => {
     const { novelId, chapterId } = req.params;
 
@@ -294,12 +320,41 @@ router.get('/list/illust/:novelId/:chapterId', async (req, res, next) => {
     });
     /// isLiked, isPurchased 추가해야함
 
-
-
-    console.log('illust set list :', firsts);
+    // console.log('illust set list :', firsts);
     res.json(firsts);
-
-
 });
+
+// 챕터의 음악 세트 목록(각 세트의 첫 음악 목록) 리턴
+router.get('/list/music/:novelId/:chapterId', async (req, res, next) => {
+    const { novelId, chapterId } = req.params;
+
+    const result = await Music.findAll({
+        attributes:['id'],
+        where: {
+            Chapter_Novel_id: novelId,
+            Chapter_id: chapterId
+        },
+        raw:true,
+        group: ['set']
+    });
+    const firstIds = result.map(id => id.id);
+
+    const firsts = await Music.findAll({
+        attributes:[['set', 'musicSetId'], ['fileName', 'musicURL'], 'title', 'nickname', 'price'],
+        where:{
+            id: {
+                [Op.in]: firstIds
+            }
+        },
+        raw:true
+    });
+    /// isLiked, isPurchased 추가해야함
+
+    // console.log('music set list :', firsts);
+    res.json({'musicSets' : firsts});
+});
+
+//music stream
+// router.get('/music/');
 
 module.exports = router;

@@ -25,7 +25,7 @@ const dbTest = require('./dbTest'); // DB 테스트용 모듈
 sequelize.sync({ force: false }) // true 시 DROP TABLE IF EXISTS 작동
     .then(() => {
         console.log('데이터베이스 연결 성공');
-        // dbTest();
+        //dbTest();
     }) 
     .catch((err) => {
         console.error(err);
