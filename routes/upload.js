@@ -1,13 +1,15 @@
 const express = require("express");
 const router = express.Router();
-// const multer = require("multer");
+const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const uuid4 = require("uuid4");
 const { verifyToken } = require("./middlewares");
 const formidable = require('express-formidable');
 const mv = require('mv');
-
+const upload =multer({
+	dest:'uploads/'
+})
 const {
 	User,
 	Novel,
@@ -278,9 +280,9 @@ router.get("/list/music/:novelId/:chapterId", async (req, res, next) => {
 
 	try {
 		const query = `
-  SELECT filename from music
+  SELECT * from music
     WHERE (Chapter_Novel_id=${novelId} and Chapter_id=${chapterId}) not in(
-	     SELECT filename from Ownedcontent
+	     SELECT contentId from Ownedcontent
    	   where (chapterId=${chapterId} and novelId=${novelId} ));`;
 		const result = await sequelize.query(query, {
 			type: sequelize.QueryTypes.SELECT,
