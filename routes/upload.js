@@ -7,9 +7,7 @@ const uuid4 = require('uuid4');
 const { verifyToken } = require('./middlewares');
 const formidable = require('express-formidable');
 const mv = require('mv');
-const upload =multer({
-	dest:'uploads/'
-})
+
 const {
 	User,
 	Novel,
