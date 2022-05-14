@@ -50,7 +50,7 @@ router.get('/info/novel/:novelId', async (req, res, next) => {
 router.get('/written/novel', verifyToken, async (req, res, next) => {
     // 임시로 유저아이디는 req.body에서 가져옴.
     const userId = req.body.userId;
-    console.log('written novel userId : ', userId);
+    // console.log('written novel userId : ', userId);
     try {
         const writtenNovels = await Novel.findAll({
             raw: true,
@@ -157,14 +157,12 @@ router.get('/content/novel/:novelId/chapter/:chapterId', async (req, res, next) 
                 raw: true
             });
 
-            let pad = 0;
             illusts.map(illust => {
                 const { fileName:url, index } = illust;
                 const md_url = '\n![alt text]('+url+')\n';
                 
-                content = insertAt(content, md_url, index+pad);
+                content = insertAt(content, md_url, index);
                 // console.log('illust inserted at index :', index);
-                pad += 4;
             });
         }
 
