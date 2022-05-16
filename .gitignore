@@ -1,0 +1,5 @@
+node_modules
+.env
+uploads/chapters/*
+uploads/illusts/*
+uploads/music/*
