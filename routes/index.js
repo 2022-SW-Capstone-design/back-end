@@ -187,7 +187,7 @@ router.get('/content/novel/:novelId/chapter/:chapterId', async (req, res, next) 
 // 소설 검색
 router.get('/search/novel', async (req, res, next) => {
     const { type, keyword } = req.query;
-    console.log('keyword :',keyword);
+    // console.log('keyword :',keyword);
     if(type == 'title') {
         const novels = await Novel.findAll({
             where:{

@@ -16,6 +16,7 @@ const production = {
   database : "noveland_db",
   host : env.DB_PROD_HOST,
   dialect : "mysql",
+  logging: false
 };
 
 const test = {

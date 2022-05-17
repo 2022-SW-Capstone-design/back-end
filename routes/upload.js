@@ -8,7 +8,7 @@ const { verifyToken } = require('./middlewares');
 const formidable = require('express-formidable');
 const mv = require('mv');
 const AWS = require('aws-sdk');
-AWS.config.loadFromPath(path.join(__dirname + '../config/aws-config.json'));
+AWS.config.loadFromPath(path.join(__dirname, '../config/aws-config.json'));
 const s3 = new AWS.S3();
 const multerS3 = require('multer-s3');
 
@@ -25,7 +25,6 @@ const {
 	Music,
 	Report,
 } = require('../models');
-const { createCipheriv } = require('crypto');
 
 // multer middleware
 const upload = multer({
