@@ -122,7 +122,7 @@ router.get('/content/novel/:novelId/chapter/:chapterId', async (req, res, next) 
                 id: chapterId,
             }
         });
-        const url = path.join(__dirname, '../uploads/chapters',await chapter.fileName);
+        const url = await chapter.fileName;
         let content = fs.readFileSync(url, {encoding:'utf-8'}).toString();
         let tracks = {};
         // console.log('content:',content);

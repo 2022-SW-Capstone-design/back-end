@@ -7,6 +7,11 @@ const uuid4 = require('uuid4');
 const { verifyToken } = require('./middlewares');
 const formidable = require('express-formidable');
 const mv = require('mv');
+const AWS = require('aws-sdk');
+AWS.config.loadFromPath(path.join(__dirname + '../config/aws-config.json'));
+const s3 = new AWS.S3();
+const multerS3 = require('multer-s3');
+
 require('dotenv').config();
 const EC2_DNS = process.env.EC2_DNS;
 
@@ -24,7 +29,16 @@ const { createCipheriv } = require('crypto');
 
 // multer middleware
 const upload = multer({
-	dest: 'uploads/'
+	storage: multerS3({
+		s3:s3,
+		bucket: 'noveland-s3-bucket',
+		key: function(req, file, cb) {
+			const fileId = uuid4();
+			const extension = path.extname(file.originalname);
+			cb(null, fileId + extension);
+		},
+		acl: 'public-read-write',
+	})
 });
 
 // 챕터 내용 파일 생성 및 챕터 추가
@@ -36,23 +50,37 @@ router.post('/chapter', verifyToken, async (req, res, next) => {
 
 	try {
 		const chapterFileName = uuid4();
+		let url = '';
+    	// fs.writeFileSync(
+      	// 	`./uploads/chapters/${chapterFileName}`,
+      	// 	content,
+		// // { encoding: 'utf8', flag: 'wx' },
+		// 	(err) => {
+		// 		console.error(err);
+		// 		next(err);
+		// 	}
+		// );
 
+		const params = {
+			Bucket: 'noveland-s3-bucket',
+			Key: `chapters/${chapterFileName}.md`,
+			Body: content,
+		};
+		s3.upload(params, (err, data) => {
+			if(err) {
+				console.error(err);
+				throw err;
+			}
+			url = data.Location;
+		});
+		console.log(`chapter uploaded. url:${url}`);
 		const chapter = await Chapter.create({
 			Novel_id: novelId,
 			title,
-			fileName: chapterFileName,
+			fileName: url,
 			price
 		});
 		chapterId = await chapter.id;
-    	fs.writeFileSync(
-      		`./uploads/chapters/${chapterFileName}`,
-      		content,
-		// { encoding: 'utf8', flag: 'wx' },
-			(err) => {
-				console.error(err);
-				next(err);
-			}
-		);
 
 		await OwnedContent.create({
 		User_id: userId,
@@ -205,20 +233,6 @@ router.post('/music', upload.single('musicFile'), verifyToken, async (req, res, 
 	let current_set_number = 0;
 
 	try {
-		const fileId = uuid4();
-		const extension = req.file.originalname.split('.').pop();
-
-		fs.renameSync(
-			path.join(__dirname, `../${req.file.path}`),
-			path.join(__dirname, `../uploads/music/${fileId}.${extension}`),
-			(err) => {
-				if (err) {
-					console.error(err);
-					throw err;
-				}
-			}
-		);
-
 		const last_set = await Music.findOne({
 			attributes:['set'],
 			where: {
@@ -246,7 +260,7 @@ router.post('/music', upload.single('musicFile'), verifyToken, async (req, res, 
 			nickname: nickname.nickname,
 			title,
 			price,
-			fileName: `http://${EC2_DNS}:8081/music/${fileId}.${extension}`,
+			fileName: req.file.location,
 			likes: 0,
 			set: current_set_number + 1
 		});
