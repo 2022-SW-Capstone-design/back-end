@@ -6,6 +6,8 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const passport = require('passport');
 const passportConfig = require('./passport');
+const hpp = require('hpp');
+const helmet = require('helmet');
 
 dotenv.config();
 const indexRouter = require('./routes/index');
@@ -18,20 +20,24 @@ const likeRouter = require('./routes/like');
 const { sequelize } = require('./models');
 
 const app = express();
-app.set('port', process.env.PORT || 8081); // 임시포트
+app.set('port', process.env.PORT || 8081);
 passportConfig();
 
-const dbTest = require('./dbTest'); // DB 테스트용 모듈
 sequelize.sync({ force: false }) // true 시 DROP TABLE IF EXISTS 작동
     .then(() => {
         console.log('데이터베이스 연결 성공');
-        //dbTest();
     }) 
     .catch((err) => {
         console.error(err);
     });  
- 
-app.use(morgan('dev'));
+
+if (process.env.NODE_ENV == 'production') {
+    app.use(morgan('combined'));
+    app.use(helmet({ contentSecurityPolicy: false }));
+    app.use(hpp());
+} else {
+    app.use(morgan('dev'));
+}
 app.use(cors());
 app.use(express.static(path.join(__dirname, '../client/myapp/public')));
 app.use(express.static(path.join(__dirname, './uploads')));

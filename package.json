@@ -1,10 +1,10 @@
 {
-  "name": "novel-arcade-server",
+  "name": "noveland-server",
   "version": "1.0.0",
-  "description": "server of novel arcade",
+  "description": "server of noveland",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "pm2-runtime start ecosystem.config.js --env production"
   },
   "repository": {
     "type": "git",
@@ -24,6 +24,8 @@
     "express": "^4.17.3",
     "express-formidable": "^1.2.0",
     "google-auth-library": "^7.14.1",
+    "helmet": "^5.0.2",
+    "hpp": "^0.2.3",
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
     "multer": "^1.4.4",

@@ -16,12 +16,7 @@ const {
     Sequelize,
     LikedContent
 } = require('../models');
-const CreateQuery = require('../testQueries.js');
 const Op = Sequelize.Op;
-
-router.get('/test', verifyToken, async(req, res, next) => {
-    res.send(`test success. id : ${req.body.userId}`);
-})
 
 //소설 요약정보 응답하기 (연수 테스트 ok)
 router.get('/info/novel/:novelId', async (req, res, next) => {

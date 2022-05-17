@@ -7,6 +7,8 @@ const uuid4 = require('uuid4');
 const { verifyToken } = require('./middlewares');
 const formidable = require('express-formidable');
 const mv = require('mv');
+require('dotenv').config();
+const EC2_DNS = process.env.EC2_DNS;
 
 const {
 	User,
@@ -129,7 +131,7 @@ router.post('/img', formidable(), async (req, res, next) => {
 				if (err) throw err;
 		});
 		return res.json({
-			url: `http://localhost:8081/illust/${fileId}.png`,
+			url: `http://${EC2_DNS}:8081/illust/${fileId}.png`,
 		});
 	} catch (err) {
 		console.error(err);
@@ -244,7 +246,7 @@ router.post('/music', upload.single('musicFile'), verifyToken, async (req, res, 
 			nickname: nickname.nickname,
 			title,
 			price,
-			fileName: `http://localhost:8081/music/${fileId}.${extension}`,
+			fileName: `http://${EC2_DNS}:8081/music/${fileId}.${extension}`,
 			likes: 0,
 			set: current_set_number + 1
 		});
