@@ -1,5 +1,6 @@
 node_modules
 .env
+/config/aws-config.json
 uploads/chapters/*
 uploads/illusts/*
 uploads/music/*
