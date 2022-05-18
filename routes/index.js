@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const fs = require('fs');
+const AWS = require('aws-sdk');
 const { verifyToken } = require('./middlewares');
+const s3 = new AWS.S3();
 
 const {
     User,
@@ -122,10 +124,15 @@ router.get('/content/novel/:novelId/chapter/:chapterId', async (req, res, next) 
                 id: chapterId,
             }
         });
-        const url = await chapter.fileName;
-        let content = fs.readFileSync(url, {encoding:'utf-8'}).toString();
+        const chapterFileName = await chapter.fileName;
+        const params = {
+            Bucket: 'noveland-s3-bucket',
+            Key: chapterFileName
+        };
+        let content = await s3.getObject(params).promise();
+        console.log('content:', content);
+        // let content = fs.readFileSync(url, {encoding:'utf-8'}).toString();
         let tracks = {};
-        // console.log('content:',content);
         if(illustSet) {
             // console.log('illust set :', illustSet);
 

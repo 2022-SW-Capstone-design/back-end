@@ -48,21 +48,12 @@ router.post('/chapter', verifyToken, async (req, res, next) => {
 	let chapterId = 0, current_chapterNumber = 0;
 
 	try {
-		const chapterFileName = uuid4();
-		let url = '';
-    	// fs.writeFileSync(
-      	// 	`./uploads/chapters/${chapterFileName}`,
-      	// 	content,
-		// // { encoding: 'utf8', flag: 'wx' },
-		// 	(err) => {
-		// 		console.error(err);
-		// 		next(err);
-		// 	}
-		// );
+		const fileId = uuid4();
+		const chapterFileName = `chapters/${fileId}.md`;
 
 		const params = {
 			Bucket: 'noveland-s3-bucket',
-			Key: `chapters/${chapterFileName}.md`,
+			Key: chapterFileName,
 			Body: content,
 		};
 		s3.upload(params, (err, data) => {
@@ -70,13 +61,12 @@ router.post('/chapter', verifyToken, async (req, res, next) => {
 				console.error(err);
 				throw err;
 			}
-			url = data.Location;
 		});
-		console.log(`chapter uploaded. url:${url}`);
+		console.log(`chapter uploaded. chapterFileName:${chapterFileName}`);
 		const chapter = await Chapter.create({
 			Novel_id: novelId,
 			title,
-			fileName: url,
+			fileName: chapterFileName,
 			price
 		});
 		chapterId = await chapter.id;
