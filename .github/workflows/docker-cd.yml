@@ -21,3 +21,9 @@ jobs:
           REMOTE_HOST: ${{ secrets.EC2_HOST }}
           REMOTE_USER: "ec2-user"
           TARGET: "/home/ec2-user/noveland_server/back-end"
+          
+      - name: Build docker image and run containers
+        run: docker-compose up -d --build
+    
+        
+     
