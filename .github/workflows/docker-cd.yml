@@ -1,4 +1,4 @@
-name: push-to-ec2
+name: docker-cd
 
 on:
   push:
@@ -10,6 +10,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Public IP
+        id: ip
+        uses: haythem/public-ip@v1.2
+
+      - name: Print Public IP
+        run: |
+          echo ${{ steps.ip.outputs.ipv4 }}
+        
       - name: Checkout the code
         uses: actions/checkout@v3
 
@@ -22,6 +30,16 @@ jobs:
           REMOTE_USER: "ec2-user"
           TARGET: "/home/ec2-user/noveland_server/back-end"
           
+      - name: 'Create env file'
+        run: |
+          touch .env
+          echo DB_PROD_USERNAME = ${{ secrets.DB_PROD_USERNAME }} >> .env
+          echo DB_PROD_PASSWORD = ${{ secrets.DB_PROD_PASSWORD }} >> .env
+          echo DB_PROD_HOST = ${{ secrets.DB_PROD_HOST }} >> .env
+          echo JWT_SECRET_KEY  = ${{ secrets.JWT_SECRET_KEY  }} >> .env
+          echo GOOGLE_CLIENT_ID   = ${{ secrets.GOOGLE_CLIENT_ID   }} >> .env
+          echo GOOGLE_CLIENT_SECRET   = ${{ secrets.GOOGLE_CLIENT_SECRET   }} >> .env
+        
       - name: Build docker image and run containers
         run: docker-compose up -d --build
     
