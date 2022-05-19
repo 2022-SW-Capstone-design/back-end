@@ -19,7 +19,9 @@ const {
     LikedContent
 } = require('../models');
 const Op = Sequelize.Op;
-
+router.get('/test', (req, res, next) => {
+    res.send("test success");
+});
 //소설 요약정보 응답하기 (연수 테스트 ok)
 router.get('/info/novel/:novelId', async (req, res, next) => {
     const novelId = req.params.novelId;
