@@ -127,10 +127,10 @@ router.get('/content/novel/:novelId/chapter/:chapterId', async (req, res, next) 
         const chapterFileName = await chapter.fileName;
         const params = {
             Bucket: 'noveland-s3-bucket',
-            Key: chapterFileName
+            Key: `${chapterFileName}.md`
         };
         let content = await s3.getObject(params).promise();
-        console.log('content:', content);
+        content = content.Body.toString('utf-8');
         // let content = fs.readFileSync(url, {encoding:'utf-8'}).toString();
         let tracks = {};
         if(illustSet) {
