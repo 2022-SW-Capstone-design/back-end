@@ -8,7 +8,6 @@ const { verifyToken } = require('./middlewares');
 const formidable = require('express-formidable');
 const mv = require('mv');
 const AWS = require('aws-sdk');
-AWS.config.loadFromPath(path.join(__dirname, '../config/aws-config.json'));
 const s3 = new AWS.S3();
 const multerS3 = require('multer-s3');
 
@@ -150,6 +149,18 @@ router.post('/img', formidable(), async (req, res, next) => {
 		return res.json({
 			url: `http://${EC2_DNS}:8081/illust/${fileId}.png`,
 		});
+		// const fileBuffer = fs.readFileSync(req.files.image);
+		// const base64data = fileBuffer.toString('base64');
+		// const params = {
+		// 	Bucket: 'noveland-s3-bucket',
+		// 	Key: `/illusts/${fileId}.png`,
+		// 	Body: base64data
+		// }
+		// await s3.upload(params, (err, data) => {
+		// 	if(err) throw err;
+		// 	res.json({url: data.Location });
+        // });
+
 	} catch (err) {
 		console.error(err);
 		next(err);
