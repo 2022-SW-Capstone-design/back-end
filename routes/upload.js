@@ -26,7 +26,7 @@ const {
 } = require('../models');
 
 // multer middleware for s3
-const uploadPath = (path) => {
+const uploadPath = (uploadpath) => {
 	return multer({
 		storage: multerS3({
 			s3:s3,
@@ -34,7 +34,7 @@ const uploadPath = (path) => {
 			key: function(req, file, cb) {
 				const fileId = uuid4();
 				const extension = path.extname(file.originalname);
-				cb(null, `${path}/` + fileId + extension);
+				cb(null, `${uploadpath}/` + fileId + extension);
 			},
 			acl: 'public-read-write',
 		})
@@ -140,7 +140,7 @@ router.post('/novel', verifyToken, async (req, res, next) => {
 });
 
 // 이미지 저장 후 url 리턴
-router.post('/img', uploadPath('/illusts').single('image'), async (req, res, next) => {
+router.post('/img', uploadPath('illusts').single('image'), async (req, res, next) => {
 	const url = req.file.location;
 	console.log('img saved. url:', url);
 	res.json({ url: url });
@@ -206,7 +206,7 @@ router.post('/illust', verifyToken, async (req, res, next) => {
 });
 
 //음악 파일 업로드
-router.post('/music', uploadPath('/music').single('musicFile'), verifyToken, async (req, res, next) => {
+router.post('/music', uploadPath('music').single('musicFile'), verifyToken, async (req, res, next) => {
 	const { novelId, chapterId, price, title } = req.body;
 	const userId = req.body.userId;
 	let current_set_number = 0;
