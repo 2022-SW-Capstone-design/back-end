@@ -15,4 +15,4 @@ services:
       - .:/home/app
       - /home/app/node_modules
       - /home/app/config
-      - /home/app/models
+      - ./models:/home/app/models
