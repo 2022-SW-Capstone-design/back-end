@@ -25,19 +25,21 @@ const {
 	Report,
 } = require('../models');
 
-// multer middleware
-const upload = multer({
-	storage: multerS3({
-		s3:s3,
-		bucket: 'noveland-s3-bucket',
-		key: function(req, file, cb) {
-			const fileId = uuid4();
-			const extension = path.extname(file.originalname);
-			cb(null, fileId + extension);
-		},
-		acl: 'public-read-write',
-	})
-});
+// multer middleware for s3
+const uploadPath = (path) => {
+	return multer({
+		storage: multerS3({
+			s3:s3,
+			bucket: 'noveland-s3-bucket',
+			key: function(req, file, cb) {
+				const fileId = uuid4();
+				const extension = path.extname(file.originalname);
+				cb(null, `${path}/` + fileId + extension);
+			},
+			acl: 'public-read-write',
+		})
+	});
+}
 
 // 챕터 내용 파일 생성 및 챕터 추가
 router.post('/chapter', verifyToken, async (req, res, next) => {
@@ -138,33 +140,10 @@ router.post('/novel', verifyToken, async (req, res, next) => {
 });
 
 // 이미지 저장 후 url 리턴
-router.post('/img', formidable(), async (req, res, next) => {
-	try {
-		const fileId = uuid4();
-		mv(req.files.image.path,
-			`./uploads/illusts/${fileId}.png`,
-			(err) => {
-				if (err) throw err;
-		});
-		return res.json({
-			url: `http://${EC2_DNS}:8081/illust/${fileId}.png`,
-		});
-		// const fileBuffer = fs.readFileSync(req.files.image);
-		// const base64data = fileBuffer.toString('base64');
-		// const params = {
-		// 	Bucket: 'noveland-s3-bucket',
-		// 	Key: `/illusts/${fileId}.png`,
-		// 	Body: base64data
-		// }
-		// await s3.upload(params, (err, data) => {
-		// 	if(err) throw err;
-		// 	res.json({url: data.Location });
-        // });
-
-	} catch (err) {
-		console.error(err);
-		next(err);
-	}
+router.post('/img', uploadPath('/illusts').single('image'), async (req, res, next) => {
+	const url = req.file.location;
+	console.log('img saved. url:', url);
+	res.json({ url: url });
 });
 
 
@@ -227,7 +206,7 @@ router.post('/illust', verifyToken, async (req, res, next) => {
 });
 
 //음악 파일 업로드
-router.post('/music', upload.single('musicFile'), verifyToken, async (req, res, next) => {
+router.post('/music', uploadPath('/music').single('musicFile'), verifyToken, async (req, res, next) => {
 	const { novelId, chapterId, price, title } = req.body;
 	const userId = req.body.userId;
 	let current_set_number = 0;
