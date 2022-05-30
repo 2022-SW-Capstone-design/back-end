@@ -1,0 +1,26 @@
+
+name: CD to EC2
+
+on:
+  push:
+    branches: [master]
+    
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: [self-hosted, label-development]
+    steps:
+        - name: pwd check
+        - run: |
+            pwd
+            ls ${{ github.workspace }}
+            
+#       - name: Check out source code
+#         uses: actions/checkout@v2
+#         with:
+#           path: 
+      
+#       - name: Docker build and run
+#         run:
+#           docker-compose up -d --build
+        
