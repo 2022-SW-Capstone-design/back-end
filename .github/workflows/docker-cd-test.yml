@@ -10,17 +10,13 @@ jobs:
     name: Deploy to EC2
     runs-on: [self-hosted, label-development]
     steps:
-        - name: pwd check
-          run: |
-            pwd
-            ls ${{ github.workspace }}
-            
-#       - name: Check out source code
-#         uses: actions/checkout@v2
-#         with:
-#           path: 
+      - name: checkout source code
+        uses: actions/checkout@v2
+        with:
+          path: '../../../../noveland_server/back-end'
       
-#       - name: Docker build and run
-#         run:
-#           docker-compose up -d --build
+      - name: Docker build and run
+        run: |
+          cd ~/noveland_server/backend
+          docker-compose up -d --build
         
