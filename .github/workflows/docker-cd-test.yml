@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: give permission to .pm2 folder
         run: |
-          sudo 777 .pm2
+          sudo chmode 777 .pm2
       - name: checkout source code
         uses: actions/checkout@v2
       - name: make .env
