@@ -12,8 +12,11 @@ jobs:
     steps:
       - name: checkout source code
         uses: actions/checkout@v2
+        with:
+          path: '../../'
       
       - name: Docker build and run
         run: |
+          cd ../../
           docker-compose up -d --build
         
