@@ -10,6 +10,8 @@ jobs:
     name: Deploy to EC2
     runs-on: [self-hosted, label-development]
     steps:
+      - name: user check
+        run: whoami
       - name: checkout source code
         uses: actions/checkout@v2
       - name: make .env
