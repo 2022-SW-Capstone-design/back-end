@@ -209,53 +209,58 @@ router.get('/search/novel', async (req, res, next) => {
     const isLoggedIn = req.headers.authorization ? 1 : 0;
     let userId = '';
 
-    if(isLoggedIn) {
-        await verifyToken(req, res, next);
-        userId = await req.body.userId;
-    }
-
-    if(type == 'title') {
-        const novels = await Novel.findAll({
-            where:{
-                title: {
-                    [Op.like]: "%"+keyword+"%"
-                }
-            },
-            raw: true
-        });
-        await Promise.all(novels.map(async novel => {
-            if(isLoggedIn) {
-                console.log('should be logged in. userID:', userId);
-                const isPurchased = await OwnedContent.findOne({
-                    where: {
-                        User_id: userId,
-                        type:'novel',
-                        novelId: novel.id,
+    try {
+        if(isLoggedIn) {
+            await verifyToken(req, res, next);
+            userId = await req.body.userId;
+        }
+    
+        if(type == 'title') {
+            const novels = await Novel.findAll({
+                where:{
+                    title: {
+                        [Op.like]: "%"+keyword+"%"
                     }
-                });
-                novel['isPurchased'] = isPurchased ? 1 : 0;
-            }
-            else {
-                novel['isPurchased'] = 0;
-            }
-        }));
-        // console.log('search novel result:', novels);
-        res.json({'novels' : novels});
-    }
-    else if(type == 'author') {
-        const novels = await Novel.findAll({
-            where:{
-                nickname: {
-                    [Op.like]: "%"+keyword+"%"
+                },
+                raw: true
+            });
+            await Promise.all(novels.map(async novel => {
+                if(isLoggedIn) {
+                    console.log('should be logged in. userID:', userId);
+                    const isPurchased = await OwnedContent.findOne({
+                        where: {
+                            User_id: userId,
+                            type:'novel',
+                            novelId: novel.id,
+                        }
+                    });
+                    novel['isPurchased'] = isPurchased ? 1 : 0;
                 }
-            },
-            raw: true
-        });
-        // console.log('search novel result:', novels);
-        res.json({'novels' : novels});
-    }
-    else {
-        res.status(403).json({"message" : "검색 타입 지정 안됨."});
+                else {
+                    novel['isPurchased'] = 0;
+                }
+            }));
+            // console.log('search novel result:', novels);
+            res.json({'novels' : novels});
+        }
+        else if(type == 'author') {
+            const novels = await Novel.findAll({
+                where:{
+                    nickname: {
+                        [Op.like]: "%"+keyword+"%"
+                    }
+                },
+                raw: true
+            });
+            // console.log('search novel result:', novels);
+            res.json({'novels' : novels});
+        }
+        else {
+            res.status(403).json({"message" : "검색 타입 지정 안됨."});
+        }
+    } catch(err) {
+        console.error(err);
+        next(err);
     }
 });
 
