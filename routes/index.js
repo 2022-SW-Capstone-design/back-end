@@ -241,7 +241,7 @@ router.get('/search/novel', async (req, res, next) => {
                 }
             }));
             // console.log('search novel result:', novels);
-            res.json({'novels' : novels});
+            return res.json({'novels' : novels});
         }
         else if(type == 'author') {
             const novels = await Novel.findAll({
@@ -253,10 +253,10 @@ router.get('/search/novel', async (req, res, next) => {
                 raw: true
             });
             // console.log('search novel result:', novels);
-            res.json({'novels' : novels});
+            return res.json({'novels' : novels});
         }
         else {
-            res.status(403).json({"message" : "검색 타입 지정 안됨."});
+            return res.status(403).json({"message" : "검색 타입 지정 안됨."});
         }
     } catch(err) {
         console.error(err);
