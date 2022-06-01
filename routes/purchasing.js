@@ -8,7 +8,7 @@ const chapter = require('../models/chapter');
 //router.post('', verifyToken, async (req, res, next) => {
 router.post('', async (req, res, next) => {
 	const purchasingSets = req.body.purchasingSets;
-	const userId = "john123@ajou.ac.kr"
+	const userId = "mkie123@ajou.ac.kr"
 	//const userId = req.body.userId;
 
 	try {
@@ -43,13 +43,13 @@ router.post('', async (req, res, next) => {
 						own: 0
 					})
 
-					/* 판매한 컨텐츠의 코인을 판매자의 코인에 추가하는 코드. 아직 미구현
+					// Chapter
 					const sellerUserId_ = await OwnedContent.findOne({
 						attributes: ['User_id'],
 						where: {
 							type: "chapter",
 							novelId: i.novelId,
-							chapterId: i.Chapter,
+							chapterId: i.chapterId,
 							own: 1,
 						}
 					})
@@ -66,13 +66,13 @@ router.post('', async (req, res, next) => {
 					await User.update(
 						{ coin: sellerCoin + i.price },
 
-						{
-							where: {
+						{ where:
+							{
 								id: sellerUserId
 							}
 						}
 					)
-					*/
+					///////////////////////////////////////////
 				}
 				else if (i.contentType == "illust") {
 					await OwnedContent.create({
@@ -83,6 +83,38 @@ router.post('', async (req, res, next) => {
 						contentId: i.contentId,
 						own: 0
 					})
+					
+					// illust
+					const sellerUserId_ = await OwnedContent.findOne({
+						attributes: ['User_id'],
+						where: {
+							type: "illust",
+							novelId: i.novelId,
+							chapterId: i.chapterId,
+							contentId: i.contentId,
+							own: 1,
+						}
+					})
+					var sellerUserId = sellerUserId_.User_id;
+
+					const sellerCoin_ = await User.findOne({
+						attributes: ['coin'],
+						where: {
+							id: sellerUserId
+						}
+					})
+					var sellerCoin = sellerCoin_.coin;
+
+					await User.update(
+						{ coin: sellerCoin + i.price },
+
+						{ where:
+							{
+								id: sellerUserId
+							}
+						}
+					)
+					///////////////////////////////////////////
 
 				}
 				else if (i.contentType == "music") {
@@ -94,6 +126,38 @@ router.post('', async (req, res, next) => {
 						contentId: i.contentId,
 						own: 0
 					})
+
+					// music
+					const sellerUserId_ = await OwnedContent.findOne({
+						attributes: ['User_id'],
+						where: {
+							type: "music",
+							novelId: i.novelId,
+							chapterId: i.chapterId,
+							contentId: i.contentId,
+							own: 1,
+						}
+					})
+					var sellerUserId = sellerUserId_.User_id;
+
+					const sellerCoin_ = await User.findOne({
+						attributes: ['coin'],
+						where: {
+							id: sellerUserId
+						}
+					})
+					var sellerCoin = sellerCoin_.coin;
+
+					await User.update(
+						{ coin: sellerCoin + i.price },
+
+						{ where:
+							{
+								id: sellerUserId
+							}
+						}
+					)
+					///////////////////////////////////////////
 				}
 				else {
 					continue;
