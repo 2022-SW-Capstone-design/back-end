@@ -206,15 +206,10 @@ router.get('/content/novel/:novelId/chapter/:chapterId', async (req, res, next) 
 router.get('/search/novel', async (req, res, next) => {
     const { type, keyword } = req.query;
     // console.log('keyword :',keyword);
-    const isLoggedIn = req.headers.authorization ? 1 : 0;
-    let userId = '';
+    const userId = req.body.userId ? req.body.userId : null;
+    const isLoggedIn = userId ? 1 : 0;
 
     try {
-        if(isLoggedIn) {
-            await verifyToken(req, res, next);
-            userId = await req.body.userId;
-        }
-    
         if(type == 'title') {
             const novels = await Novel.findAll({
                 where:{
@@ -239,9 +234,9 @@ router.get('/search/novel', async (req, res, next) => {
                 }));
             }
             else {
-                await Promise.all(novels.map(async novel => {
+                novels.map(novel => {
                     novel['isPurchased'] = 0;
-                }));
+                });
             }
 
             // console.log('search novel result:', novels);
@@ -264,7 +259,7 @@ router.get('/search/novel', async (req, res, next) => {
         }
     } catch(err) {
         console.error(err);
-        return res.end();
+        next(err);
     }
 });
 
