@@ -126,7 +126,7 @@ router.post('/novel', verifyToken, async (req, res, next) => {
 			raw: true,
 		});
 
-		await Novel.create({
+		const novel = await Novel.create({
 			User_id: userId,
 			nickname: nickname.nickname,
 			title,
@@ -137,6 +137,15 @@ router.post('/novel', verifyToken, async (req, res, next) => {
 			rating: 0,
 			chapterNumber: 0
 		});
+
+		await OwnedContent.create({
+			User_id: userId,
+			type: 'novel',
+			novelId: novel.id,
+			own: true
+		});
+
+
 	} catch (err) {
 		console.log(err);
 		next(err);
@@ -205,7 +214,14 @@ router.post('/illust', verifyToken, async (req, res, next) => {
 			}
 		})
 	);
-	console.log('illust create success.');
+	await OwnedContent.create({
+		User_id: userId,
+		type: 'illust',
+		novelId,
+		chapterId,
+		contentId: current_set_number + 1,
+		own: true
+	});
 	res.end();
 });
 
@@ -247,7 +263,15 @@ router.post('/music', uploadPath('music').single('musicFile'), verifyToken, asyn
 			likes: 0,
 			set: current_set_number + 1
 		});
-		console.log('music create success.');
+
+		await OwnedContent.create({
+			User_id: userId,
+			type: 'music',
+			novelId,
+			chapterId,
+			contentId: current_set_number + 1,
+			own: true
+		});
 		res.end();
 	} catch (err) {
 		console.error(err);

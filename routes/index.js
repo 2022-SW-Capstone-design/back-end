@@ -61,6 +61,11 @@ router.get('/written/novel', verifyToken, async (req, res, next) => {
                 User_id: userId,
             }
         });
+
+        await Promise.all(writtenNovels.map(async novel => {
+            novel['isPurchased'] = 1;
+        }));
+
         // console.log('written novels :', writtenNovels);
         res.json(writtenNovels);
     } catch (err) {
@@ -201,6 +206,14 @@ router.get('/content/novel/:novelId/chapter/:chapterId', async (req, res, next) 
 router.get('/search/novel', async (req, res, next) => {
     const { type, keyword } = req.query;
     // console.log('keyword :',keyword);
+    const isLoggedIn = req.headers.authorization ? 1 : 0;
+    let userId = '';
+
+    if(isLoggedIn) {
+        verifyToken(req, res, next);
+        userId = req.body.userId;
+    }
+
     if(type == 'title') {
         const novels = await Novel.findAll({
             where:{
@@ -210,6 +223,21 @@ router.get('/search/novel', async (req, res, next) => {
             },
             raw: true
         });
+        await Promise.all(novels.map(async novel => {
+            if(isLoggedIn) {
+                const isPurchased = await OwnedContent.findOne({
+                    where: {
+                        User_id: userId,
+                        type:'novel',
+                        novelId: novel.id,
+                    }
+                });
+                novel['isPurchased'] = isPurchased ? 1 : 0;
+            }
+            else {
+                novel['isPurchased'] = 0;
+            }
+        }));
         // console.log('search novel result:', novels);
         res.json({'novels' : novels});
     }
