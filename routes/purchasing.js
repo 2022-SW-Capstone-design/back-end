@@ -5,10 +5,10 @@ const { verifyToken } = require('./middlewares');
 const { User, Illust, Music, Chapter, OwnedContent } = require('../models');
 const chapter = require('../models/chapter');
 
-//router.post('', verifyToken, async (req, res, next) => {
-router.post('', async (req, res, next) => {
+router.post('', verifyToken, async (req, res, next) => {
+//router.post('', async (req, res, next) => {
 	const purchasingSets = req.body.purchasingSets;
-	const userId = "mkie123@ajou.ac.kr"
+	//const userId = "mkie123@ajou.ac.kr"
 	//const userId = req.body.userId;
 
 	try {
