@@ -224,22 +224,26 @@ router.get('/search/novel', async (req, res, next) => {
                 },
                 raw: true
             });
-            await Promise.all(novels.map(async novel => {
-                if(isLoggedIn) {
-                    console.log('should be logged in. userID:', userId);
+            if(isLoggedIn) {
+                console.log('should be logged in. userID:', userId);
+                await Promise.all(novels.map(async novel => {
                     const isPurchased = await OwnedContent.findOne({
                         where: {
                             User_id: userId,
                             type:'novel',
                             novelId: novel.id,
-                        }
+                        },
+                        raw: true
                     });
                     novel['isPurchased'] = isPurchased ? 1 : 0;
-                }
-                else {
+                }));
+            }
+            else {
+                await Promise.all(novels.map(async novel => {
                     novel['isPurchased'] = 0;
-                }
-            }));
+                }));
+            }
+
             // console.log('search novel result:', novels);
             return res.json({'novels' : novels});
         }
@@ -260,7 +264,7 @@ router.get('/search/novel', async (req, res, next) => {
         }
     } catch(err) {
         console.error(err);
-        next(err);
+        return res.end();
     }
 });
 
