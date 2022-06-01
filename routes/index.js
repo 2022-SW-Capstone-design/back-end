@@ -393,6 +393,25 @@ router.get('/list/music/:novelId/:chapterId', async (req, res, next) => {
     res.json({'musicSets' : firsts});
 });
 
+
+
+router.get('/info/user',  verifyToken, async (req, res, next) => {
+    //const userId = 'john123@ajou.ac.kr';
+    try {
+        const userInfo = await User.findOne({
+            attributes: ['nickname', 'coin', 'admin'],
+            where: {id : userId}
+        })
+        res.send(userInfo);
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
+
+    
+});
+
+
 //music stream
 // router.get('/music/');
 
