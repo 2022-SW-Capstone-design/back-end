@@ -210,8 +210,8 @@ router.get('/search/novel', async (req, res, next) => {
     let userId = '';
 
     if(isLoggedIn) {
-        verifyToken(req, res, next);
-        userId = req.body.userId;
+        await verifyToken(req, res, next);
+        userId = await req.body.userId;
     }
 
     if(type == 'title') {
