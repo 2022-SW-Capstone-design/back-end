@@ -225,6 +225,7 @@ router.get('/search/novel', async (req, res, next) => {
         });
         await Promise.all(novels.map(async novel => {
             if(isLoggedIn) {
+                console.log('should be logged in. userID:', userId);
                 const isPurchased = await OwnedContent.findOne({
                     where: {
                         User_id: userId,
