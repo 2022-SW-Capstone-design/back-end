@@ -8,10 +8,14 @@ const { verifyToken } = require('./middlewares');
 const formidable = require('express-formidable');
 const mv = require('mv');
 const AWS = require('aws-sdk');
-const s3 = new AWS.S3();
+require('dotenv').config();
+const s3 = new AWS.S3({
+	accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+	secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+	region: 'ap-northeast-2'
+});
 const multerS3 = require('multer-s3');
 
-require('dotenv').config();
 const EC2_DNS = process.env.EC2_DNS;
 
 const {

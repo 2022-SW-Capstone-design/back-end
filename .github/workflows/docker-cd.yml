@@ -24,6 +24,8 @@ jobs:
           echo JWT_SECRET_KEY  = ${{ secrets.JWT_SECRET_KEY  }} >> .env
           echo GOOGLE_CLIENT_ID   = ${{ secrets.GOOGLE_CLIENT_ID   }} >> .env
           echo GOOGLE_CLIENT_SECRET   = ${{ secrets.GOOGLE_CLIENT_SECRET   }} >> .env
+          echo AWS_ACCESS_KEY_ID   = ${{ secrets.AWS_ACCESS_KEY_ID   }} >> .env
+          echo AWS_SECRET_ACCESS_KEY   = ${{ secrets.AWS_SECRET_ACCESS_KEY   }} >> .env
           
       - name: Docker build and run
         run: |
