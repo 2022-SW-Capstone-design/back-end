@@ -16,7 +16,7 @@ const uploadRouter = require('./routes/upload');
 const commentRouter = require('./routes/comment');
 const reportRouter = require('./routes/report');
 const likeRouter = require('./routes/like');
-
+const purchasingRouter = require('./routes/purchasing');
 const { sequelize } = require('./models');
 
 const app = express();
@@ -55,6 +55,7 @@ app.use('/upload', uploadRouter);
 app.use('/comment', commentRouter);
 app.use('/report', reportRouter);
 app.use('/like', likeRouter);
+app.use('/purchasing', purchasingRouter);
 
 // no router
 app.use((req, res, next) => {
