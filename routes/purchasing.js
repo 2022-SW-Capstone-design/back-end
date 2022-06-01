@@ -9,7 +9,7 @@ router.post('', verifyToken, async (req, res, next) => {
 //router.post('', async (req, res, next) => {
 	const purchasingSets = req.body.purchasingSets;
 	//const userId = "mkie123@ajou.ac.kr"
-	//const userId = req.body.userId;
+	const userId = req.body.userId;
 
 	try {
 		var totalPrice = 0;
