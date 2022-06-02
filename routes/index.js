@@ -400,15 +400,14 @@ router.get('/info/user',  verifyToken, async (req, res, next) => {
     try {
         const userInfo = await User.findOne({
             attributes: ['nickname', 'coin', 'admin'],
-            where: {id : userId}
+            where: {id : req.body.userId},
+            raw:true
         })
-        res.send(userInfo);
+        res.json(userInfo);
     } catch (err) {
         console.error(err);
         next(err);
     }
-
-    
 });
 
 
