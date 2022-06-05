@@ -110,9 +110,8 @@ router.post('/google', async(req, res, next) => {
         else {
             await User.create({
                 id : email,
-                password : "asdf", // 구글 로그인 시 비밀번호는 필요가 없게 됨
                 nickname : name,
-                coin : 0,
+                coin : 10000,
                 admin : 0
             }).then(user => console.log(`${email} created.`));
         }
