@@ -62,9 +62,9 @@ router.get('/written/novel', verifyToken, async (req, res, next) => {
             }
         });
 
-        await Promise.all(writtenNovels.map(async novel => {
+        writtenNovels.map(novel => {
             novel['isPurchased'] = 1;
-        }));
+        });
 
         // console.log('written novels :', writtenNovels);
         res.json(writtenNovels);
@@ -84,20 +84,22 @@ router.get('/purchased/novel', verifyToken, async (req, res, next) => {
         select *
         from novel, ownedContent
         where ownedContent.type = "novel"
-        and ownedContent.id = novel.id
+        and ownedContent.novelId = novel.id
         and ownedContent.User_id = "${userId}"
         and own = 0;
         `;
 
-        const result = await sequelize.query(query, {
+        const purchasedNovels = await sequelize.query(query, {
             type: sequelize.QueryTypes.SELECT
         });
-        res.send({
-            "novels": result
+        purchasedNovels.map(novel => {
+            novel['isPurchased'] = 1;
         });
 
+        res.json(purchasedNovels);
     } catch (err) {
         console.log(err);
+        next(err);
     }
 });
 
