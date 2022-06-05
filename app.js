@@ -10,6 +10,15 @@ const hpp = require('hpp');
 const helmet = require('helmet');
 
 dotenv.config();
+const { sequelize } = require('./models');
+sequelize.sync({ force: false }) // true 시 DROP TABLE IF EXISTS 작동
+    .then(() => {
+        console.log('데이터베이스 연결 성공');
+    }) 
+    .catch((err) => {
+        console.error(err);
+    }); 
+    
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
 const uploadRouter = require('./routes/upload');
@@ -17,19 +26,13 @@ const commentRouter = require('./routes/comment');
 const reportRouter = require('./routes/report');
 const likeRouter = require('./routes/like');
 const purchasingRouter = require('./routes/purchasing');
-const { sequelize } = require('./models');
+
 
 const app = express();
 app.set('port', process.env.PORT || 8081);
 passportConfig();
 
-sequelize.sync({ force: false }) // true 시 DROP TABLE IF EXISTS 작동
-    .then(() => {
-        console.log('데이터베이스 연결 성공');
-    }) 
-    .catch((err) => {
-        console.error(err);
-    });  
+ 
 
 if (process.env.NODE_ENV == 'production') {
     app.use(morgan('combined'));
