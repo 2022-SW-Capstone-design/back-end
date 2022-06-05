@@ -324,7 +324,8 @@ router.get('/list/novel/:novelId', verifyToken, async (req, res, next) => {
                     type:'chapter',
                     novelId: novelId,
                     chapterId: chapter.id
-                }
+                },
+                raw:true
             });
             chapter['isPurchased'] = isPurchased ? 1 : 0;
         }));
@@ -336,8 +337,9 @@ router.get('/list/novel/:novelId', verifyToken, async (req, res, next) => {
 });
 
 // 챕터의 일러스트 세트 목록(각 세트의 첫 일러스트 목록) 리턴
-router.get('/list/illust/:novelId/:chapterId', async (req, res, next) => {
+router.get('/list/illust/:novelId/:chapterId', verifyToken, async (req, res, next) => {
     const { novelId, chapterId } = req.params;
+    const userId = req.body.userId;
 
     const result = await Illust.findAll({
         attributes:['id'],
@@ -359,15 +361,28 @@ router.get('/list/illust/:novelId/:chapterId', async (req, res, next) => {
         },
         raw:true
     });
-    /// isLiked, isPurchased 추가해야함
+    await Promise.all(firsts.map(async illust => {
+        const isPurchased = await OwnedContent.findOne({
+            where: {
+                User_id: userId,
+                type:'illust',
+                novelId: novelId,
+                chapterId: chapterId,
+                contentId: illust.illustSetId
+            },
+            raw: true
+        });
+        illust['isPurchased'] = isPurchased ? 1 : 0;
+    }));
 
     // console.log('illust set list :', firsts);
     res.json(firsts);
 });
 
 // 챕터의 음악 세트 목록(각 세트의 첫 음악 목록) 리턴
-router.get('/list/music/:novelId/:chapterId', async (req, res, next) => {
+router.get('/list/music/:novelId/:chapterId', verifyToken, async (req, res, next) => {
     const { novelId, chapterId } = req.params;
+    const userId = req.body.userId;
 
     const result = await Music.findAll({
         attributes:['id'],
@@ -389,7 +404,20 @@ router.get('/list/music/:novelId/:chapterId', async (req, res, next) => {
         },
         raw:true
     });
-    /// isLiked, isPurchased 추가해야함
+
+    await Promise.all(firsts.map(async music => {
+        const isPurchased = await OwnedContent.findOne({
+            where: {
+                User_id: userId,
+                type:'music',
+                novelId: novelId,
+                chapterId: chapterId,
+                contentId: music.musicSetId
+            },
+            raw: true
+        });
+        music['isPurchased'] = isPurchased ? 1 : 0;
+    }));
 
     // console.log('music set list :', firsts);
     res.json({'musicSets' : firsts});
