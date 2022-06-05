@@ -82,10 +82,10 @@ router.get('/purchased/novel', verifyToken, async (req, res, next) => {
         //sequelize 방식이 복잡하여 일단 raw query 사용
         const query = `
         select *
-        from novel, ownedContent
-        where ownedContent.type = "novel"
-        and ownedContent.novelId = novel.id
-        and ownedContent.User_id = "${userId}"
+        from novel, OwnedContent
+        where OwnedContent.type = "novel"
+        and OwnedContent.novelId = novel.id
+        and OwnedContent.User_id = "${userId}"
         and own = 0;
         `;
 
