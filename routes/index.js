@@ -79,20 +79,12 @@ router.get('/purchased/novel', verifyToken, async (req, res, next) => {
     // 임시로 유저아이디는 req.body에서 가져옴.
     const userId = req.body.userId;
     try {
-        const testQuery = `
-        show tables;
-        `;
-        const testResult = await sequelize.query(testQuery, {
-            type: sequelize.QueryTypes.SHOWTABLES
-        });
-        console.log('test result:', testResult);
-
         const query = `
         select *
-        from novel, OwnedContent
-        where OwnedContent.type = "novel"
-        and OwnedContent.novelId = novel.id
-        and OwnedContent.User_id = "${userId}"
+        from novel, ownedcontent
+        where ownedcontent.type = "novel"
+        and ownedcontent.novelId = novel.id
+        and ownedcontent.User_id = "${userId}"
         and own = 0;
         `;
 
