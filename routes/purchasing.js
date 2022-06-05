@@ -34,7 +34,7 @@ router.post('', verifyToken, async (req, res, next) => {
 			for (var i of purchasingSets) {
 				// console.log(i);
 				if (i.contentType == "chapter") {
-					const novel = OwnedContent.findOne({
+					const novel = await OwnedContent.findOne({
 						raw:true,
 						where: {
 							User_id: userId,
