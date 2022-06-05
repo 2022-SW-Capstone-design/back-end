@@ -80,7 +80,8 @@ router.get('/purchased/novel', verifyToken, async (req, res, next) => {
     const userId = req.body.userId;
     try {
         const query = `
-        select *
+        select novel.id, novel.User_id, title, description, genre, coverFileName, 
+            defaultPrice, rating, chapterNumber, nickname
         from novel, ownedcontent
         where ownedcontent.type = "novel"
         and ownedcontent.novelId = novel.id
