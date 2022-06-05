@@ -32,8 +32,28 @@ router.post('', verifyToken, async (req, res, next) => {
 		else if (userCoin >= totalPrice) {
 
 			for (var i of purchasingSets) {
-				console.log(i);
+				// console.log(i);
 				if (i.contentType == "chapter") {
+					const novel = OwnedContent.findOne({
+						raw:true,
+						where: {
+							User_id: userId,
+							type:'novel',
+							novelId: i.novelId,
+							own: 0
+						}
+					});
+					console.log('owned novel searched:', novel);
+					if(!novel) {
+						await OwnedContent.create({
+							User_id: userId,
+							type: "novel",
+							novelId: i.novelId,
+							own: 0
+						});
+					}
+
+
 					await OwnedContent.create({
 						User_id: userId,
 						type: "chapter",
