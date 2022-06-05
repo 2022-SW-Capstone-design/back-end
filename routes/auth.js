@@ -111,7 +111,7 @@ router.post('/google', async(req, res, next) => {
             await User.create({
                 id : email,
                 nickname : name,
-                coin : 10000,
+                coin : 1000000,
                 admin : 0
             }).then(user => console.log(`${email} created.`));
         }
