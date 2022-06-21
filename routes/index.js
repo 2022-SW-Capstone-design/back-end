@@ -1,7 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const path = require('path');
-const fs = require('fs');
 const AWS = require('aws-sdk');
 const { verifyToken } = require('./middlewares');
 const s3 = new AWS.S3({
@@ -20,13 +18,9 @@ const {
     Music,
     sequelize,
     Sequelize,
-    LikedContent,
 } = require('../models');
 const Op = Sequelize.Op;
-router.get('/test', (req, res, next) => {
-    res.send('test success');
-});
-//소설 요약정보 응답하기 (연수 테스트 ok)
+
 router.get('/info/novel/:novelId', async (req, res, next) => {
     const novelId = req.params.novelId;
 
@@ -42,7 +36,6 @@ router.get('/info/novel/:novelId', async (req, res, next) => {
                 id: novelId,
             },
         });
-        // console.log(novelInfo);
         res.send(novelInfo);
     } catch (err) {
         console.log(err);
@@ -50,11 +43,9 @@ router.get('/info/novel/:novelId', async (req, res, next) => {
     }
 });
 
-// 직접 쓴 소설 가져오기(연수 테스트 ok)
 router.get('/written/novel', verifyToken, async (req, res, next) => {
-    // 임시로 유저아이디는 req.body에서 가져옴.
     const userId = req.body.userId;
-    // console.log('written novel userId : ', userId);
+
     try {
         const writtenNovels = await Novel.findAll({
             raw: true,
@@ -67,7 +58,6 @@ router.get('/written/novel', verifyToken, async (req, res, next) => {
             novel['isPurchased'] = 1;
         });
 
-        // console.log('written novels :', writtenNovels);
         res.json(writtenNovels);
     } catch (err) {
         console.log(err);
@@ -75,9 +65,7 @@ router.get('/written/novel', verifyToken, async (req, res, next) => {
     }
 });
 
-// 구매한 소설 가져오기
 router.get('/purchased/novel', verifyToken, async (req, res, next) => {
-    // 임시로 유저아이디는 req.body에서 가져옴.
     const userId = req.body.userId;
     try {
         const query = `
@@ -104,32 +92,15 @@ router.get('/purchased/novel', verifyToken, async (req, res, next) => {
     }
 });
 
-router.get('/purchased/illust', async (req, res, next) => {});
+const insertAt = (str, sub, pos) => `${str.slice(0, pos)}${sub}${str.slice(pos)}`;
 
-const insertAt = (str, sub, pos) =>
-    `${str.slice(0, pos)}${sub}${str.slice(pos)}`;
-// 컨텐츠 구매여부 파악 후 챕터의 내용 리턴
 router.get(
     '/content/novel/:novelId/chapter/:chapterId',
     async (req, res, next) => {
         const { novelId, chapterId } = req.params;
         const { illustSet, musicSet } = req.query;
-        // const userId = req.body.userId;
 
         try {
-            // const owned = await OwnedContent.findOne({
-            //     attributes:['own'],
-            //     where:{
-            //         User_id: userId,
-            //         type: 'chapter',
-            //         novelId: novelId,
-            //         chapterId: chapterId
-            //     }
-            // });
-            // if(!owned) {
-            //     res.status(403).json({"message" : "구매하지 않은 챕터입니다."});
-            // }
-
             const chapter = await Chapter.findOne({
                 attributes: ['fileName'],
                 where: {
@@ -144,25 +115,9 @@ router.get(
             };
             let content = await s3.getObject(params).promise();
             content = content.Body.toString('utf-8');
-            // let content = fs.readFileSync(url, {encoding:'utf-8'}).toString();
+
             let tracks = {};
             if (illustSet) {
-                // console.log('illust set :', illustSet);
-
-                // const owned = await OwnedContent.findOne({
-                //     attributes:['own'],
-                //     where:{
-                //         User_id: userId,
-                //         type: 'illust',
-                //         novelId: novelId,
-                //         chapterId: chapterId,
-                //         contentId: illustSet
-                //     }
-                // });
-                // if(!owned) {
-                //     res.status(403).json({"message" : "구매하지 않은 일러스트 세트 입니다."});
-                // }
-
                 const illusts = await Illust.findAll({
                     where: {
                         Chapter_Novel_id: novelId,
@@ -177,7 +132,6 @@ router.get(
                     const md_url = '\n![alt text](' + url + ')\n';
 
                     content = insertAt(content, md_url, index);
-                    // console.log('illust inserted at index :', index);
                 });
             }
 
@@ -192,8 +146,6 @@ router.get(
                     raw: true,
                 });
             }
-            // content = content.replace('\\n', '<br>');
-            // console.log('after content:', content);
             return res.json({
                 chapterContent: content,
                 musicTracks: tracks,
@@ -204,10 +156,8 @@ router.get(
     }
 );
 
-// 소설 검색
 router.get('/search/novel', async (req, res, next) => {
     const { type, keyword } = req.query;
-    // console.log('keyword :',keyword);
     const userId = req.body.userId ? req.body.userId : null;
     const isLoggedIn = userId ? 1 : 0;
 
@@ -242,7 +192,6 @@ router.get('/search/novel', async (req, res, next) => {
                 });
             }
 
-            // console.log('search novel result:', novels);
             return res.json({ novels: novels });
         } else if (type == 'author') {
             const novels = await Novel.findAll({
@@ -253,7 +202,6 @@ router.get('/search/novel', async (req, res, next) => {
                 },
                 raw: true,
             });
-            // console.log('search novel result:', novels);
             return res.json({ novels: novels });
         } else {
             return res.status(403).json({ message: '검색 타입 지정 안됨.' });
@@ -304,7 +252,6 @@ router.get('/comment/user/:novelId/:chapterId', async (req, res, next) => {
     }
 });
 
-// 소설의 챕터목록 리턴
 router.get('/list/novel/:novelId', verifyToken, async (req, res, next) => {
     const novelId = req.params.novelId;
     const userId = req.body.userId;
@@ -338,7 +285,6 @@ router.get('/list/novel/:novelId', verifyToken, async (req, res, next) => {
     }
 });
 
-// 챕터의 일러스트 세트 목록(각 세트의 첫 일러스트 목록) 리턴
 router.get(
     '/list/illust/:novelId/:chapterId',
     verifyToken,
@@ -386,13 +332,10 @@ router.get(
                 illust['isPurchased'] = isPurchased ? 1 : 0;
             })
         );
-
-        // console.log('illust set list :', firsts);
         res.json(firsts);
     }
 );
 
-// 챕터의 음악 세트 목록(각 세트의 첫 음악 목록) 리턴
 router.get(
     '/list/music/:novelId/:chapterId',
     verifyToken,
@@ -442,14 +385,11 @@ router.get(
                 music['isPurchased'] = isPurchased ? 1 : 0;
             })
         );
-
-        // console.log('music set list :', firsts);
         res.json({ musicSets: firsts });
     }
 );
 
 router.get('/info/user', verifyToken, async (req, res, next) => {
-    //const userId = 'john123@ajou.ac.kr';
     try {
         const userInfo = await User.findOne({
             attributes: ['nickname', 'coin', 'admin'],
@@ -462,8 +402,5 @@ router.get('/info/user', verifyToken, async (req, res, next) => {
         next(err);
     }
 });
-
-//music stream
-// router.get('/music/');
 
 module.exports = router;

@@ -5,12 +5,7 @@ const { verifyToken } = require('./middlewares');
 const { UserComment, CriticComment, User } = require('../models');
 
 router.post('/user', verifyToken, async (req, res, next) => {
-    var chapterId = req.body.chapterId;
-    var novelId = req.body.novelId;
-    var userId = req.body.userId;
-    //var userId = 'john123@ajou.ac.kr'; //임시
-    var content = req.body.content;
-    var rating = req.body.rating;
+    const { chapterId, novelId, userId, content, rating } = req.body;
 
     try {
         await UserComment.create({
@@ -28,11 +23,7 @@ router.post('/user', verifyToken, async (req, res, next) => {
 });
 
 router.post('/critic', verifyToken, async (req, res, next) => {
-    var novelId = req.body.novelId;
-    var rating = req.body.rating;
-    var content = req.body.content;
-    var userId = req.body.userId;
-    //var userId = 'john123@ajou.ac.kr'; //임시
+    const { novelId, rating, content, userId } = req.body;
 
     try {
         var nickname = await User.findOne({
@@ -58,25 +49,9 @@ router.post('/critic', verifyToken, async (req, res, next) => {
 });
 
 router.get('/user/:novelId/:chapterId', async (req, res, next) => {
-    if (req.query.page == undefined) {
-        var page = 1;
-    } else {
-        var page = Number(req.query.page);
-    }
-
-    if (req.query.each == undefined) {
-        var each = 10;
-    } else {
-        var each = Number(req.query.each);
-    }
-
-    if (req.query.sorted == 'old') {
-        var sorted = 'asc';
-    } else if (req.query.sorted == 'new') {
-        var sorted = 'desc';
-    } else if (req.query.sorted == undefined) {
-        var sorted = 'desc';
-    }
+    const page = req.query.page ? Number(req.query.page) : 1;
+    const each = req.query.each ? Number(req.query.each) : 10;
+    const sorted = req.query.sorted == 'old' ? 'asc' : 'desc';
 
     try {
         var comment = await UserComment.findAll({
@@ -96,16 +71,9 @@ router.get('/user/:novelId/:chapterId', async (req, res, next) => {
 });
 
 router.get('/critic/:novelId', async (req, res, next) => {
-    var page = Number(req.query.page);
-    var each = Number(req.query.each);
-
-    if (req.query.sorted == 'old') {
-        var sorted = 'asc';
-    } else if (req.query.sorted == 'new') {
-        var sorted = 'desc';
-    } else if (req.query.sorted == undefined) {
-        var sorted = 'desc';
-    }
+    const page = Number(req.query.page);
+    const each = Number(req.query.each);
+    const sorted = req.query.sorted == 'old' ? 'asc' : 'desc';
 
     try {
         var comment = await CriticComment.findAll({

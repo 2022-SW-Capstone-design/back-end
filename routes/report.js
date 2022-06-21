@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { Report } = require('../models');
 
-//사용자가 등록한 신고를 서버에 업로드(연수 테스트 ok)
 router.post('/upload', async (req, res, next) => {
     const { userId, title, commentId, category, content } = req.body;
     try {
@@ -17,7 +16,6 @@ router.post('/upload', async (req, res, next) => {
     res.json({ message: 'report upload success' });
 });
 
-//신고 ID에 대한 신고내용 출력(연수 테스트 ok)
 router.get('/content/:reportId', async (req, res, next) => {
     const id = req.params.reportId;
     console.log(id);
@@ -36,32 +34,20 @@ router.get('/content/:reportId', async (req, res, next) => {
 });
 
 router.get('/list', async (req, res, next) => {
-    if (req.query.page == undefined) {
-        var page = 1;
-    } else {
-        var page = Number(req.query.page);
-    }
+    const page = req.query.page ? Number(req.query.page) : 1;
+    const each = req.query.each ? Number(req.query.each) : 10;
+    const sorted = req.query.sorted == 'old' ? 'asc' : 'desc';
 
-    if (req.query.each == undefined) {
-        var each = 10;
-    } else {
-        var each = Number(req.query.each);
-    }
-
-    if (req.query.category == 'comment') {
-        var category = '댓글';
-    } else if (req.query.category == 'novel') {
-        var category = '소설';
-    } else {
-        var category = ['소설', '댓글'];
-    }
-
-    if (req.query.sorted == 'old') {
-        var sorted = 'asc';
-    } else if (req.query.sorted == 'new') {
-        var sorted = 'desc';
-    } else if (req.query.sorted == undefined) {
-        var sorted = 'desc';
+    let category = '';
+    switch (req.query.category) {
+        case 'comment':
+            category = '댓글';
+            break;
+        case 'novel':
+            category = '소설';
+            break;
+        default:
+            category = ['소설', '댓글'];
     }
 
     try {

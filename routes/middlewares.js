@@ -37,27 +37,25 @@ module.exports = {
                 const userId = authData.userId;
 
                 try {
-                    await User.findOne({
+                    const user = await User.findOne({
                         where: {
                             id: userId,
                         },
-                    }).then((user) => {
-                        if (user) {
-                            req.body.userId = user.id;
-                        } else {
-                            return res
-                                .status(403)
-                                .json({
-                                    message: '아이디가 존재하지 않습니다.',
-                                });
-                        }
                     });
+
+                    if (user) {
+                        req.body.userId = user.id;
+                    } else {
+                        return res.status(403).json({
+                            message: '아이디가 존재하지 않습니다.',
+                        });
+                    }
                 } catch (err) {
                     console.error(err);
+                    next(err);
                 }
             }
         );
-
         next();
     },
 };

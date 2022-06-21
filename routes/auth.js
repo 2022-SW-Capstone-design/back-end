@@ -106,29 +106,25 @@ router.post('/google', async (req, res, next) => {
             },
         });
 
-        if (user) {
-            console.log(`${email} found.`);
-        } else {
+        if (!user) {
             await User.create({
                 id: email,
                 nickname: name,
                 coin: 1000000,
                 admin: 0,
-            }).then((user) => console.log(`${email} created.`));
+            });
         }
 
         const token = jwt.sign(
             {
                 userId: email,
                 nickname: name,
-                // auth: user.auth
             },
             process.env.JWT_SECRET_KEY,
             {
                 expiresIn: '1h',
             }
         );
-
         res.json({
             token: token,
         });

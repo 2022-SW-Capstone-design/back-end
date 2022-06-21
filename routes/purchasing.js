@@ -6,14 +6,12 @@ const { User, Illust, Music, Chapter, OwnedContent } = require('../models');
 const chapter = require('../models/chapter');
 
 router.post('', verifyToken, async (req, res, next) => {
-    //router.post('', async (req, res, next) => {
     const purchasingSets = req.body.purchasingSets;
-    //const userId = "mkie123@ajou.ac.kr"
     const userId = req.body.userId;
 
     try {
-        var totalPrice = 0;
-        for (var i of purchasingSets) {
+        let totalPrice = 0;
+        for (let i of purchasingSets) {
             totalPrice += i.price;
         }
         const userCoin_ = await User.findOne({
@@ -29,8 +27,7 @@ router.post('', verifyToken, async (req, res, next) => {
                 message: 'not enough coins',
             });
         } else if (userCoin >= totalPrice) {
-            for (var i of purchasingSets) {
-                // console.log(i);
+            for (let i of purchasingSets) {
                 if (i.contentType == 'chapter') {
                     const novel = await OwnedContent.findOne({
                         raw: true,
@@ -41,7 +38,7 @@ router.post('', verifyToken, async (req, res, next) => {
                             own: 0,
                         },
                     });
-                    console.log('owned novel searched:', novel);
+
                     if (!novel) {
                         await OwnedContent.create({
                             User_id: userId,
@@ -60,7 +57,6 @@ router.post('', verifyToken, async (req, res, next) => {
                         own: 0,
                     });
 
-                    // Chapter
                     const sellerUserId_ = await OwnedContent.findOne({
                         attributes: ['User_id'],
                         where: {
@@ -70,7 +66,7 @@ router.post('', verifyToken, async (req, res, next) => {
                             own: 1,
                         },
                     });
-                    var sellerUserId = sellerUserId_.User_id;
+                    let sellerUserId = sellerUserId_.User_id;
 
                     const sellerCoin_ = await User.findOne({
                         attributes: ['coin'],
@@ -78,7 +74,7 @@ router.post('', verifyToken, async (req, res, next) => {
                             id: sellerUserId,
                         },
                     });
-                    var sellerCoin = sellerCoin_.coin;
+                    let sellerCoin = sellerCoin_.coin;
 
                     await User.update(
                         { coin: sellerCoin + i.price },
@@ -100,7 +96,6 @@ router.post('', verifyToken, async (req, res, next) => {
                         own: 0,
                     });
 
-                    // illust
                     const sellerUserId_ = await OwnedContent.findOne({
                         attributes: ['User_id'],
                         where: {
@@ -111,7 +106,7 @@ router.post('', verifyToken, async (req, res, next) => {
                             own: 1,
                         },
                     });
-                    var sellerUserId = sellerUserId_.User_id;
+                    let sellerUserId = sellerUserId_.User_id;
 
                     const sellerCoin_ = await User.findOne({
                         attributes: ['coin'],
@@ -119,7 +114,7 @@ router.post('', verifyToken, async (req, res, next) => {
                             id: sellerUserId,
                         },
                     });
-                    var sellerCoin = sellerCoin_.coin;
+                    let sellerCoin = sellerCoin_.coin;
 
                     await User.update(
                         { coin: sellerCoin + i.price },
@@ -130,7 +125,6 @@ router.post('', verifyToken, async (req, res, next) => {
                             },
                         }
                     );
-                    ///////////////////////////////////////////
                 } else if (i.contentType == 'music') {
                     await OwnedContent.create({
                         User_id: userId,
@@ -141,7 +135,6 @@ router.post('', verifyToken, async (req, res, next) => {
                         own: 0,
                     });
 
-                    // music
                     const sellerUserId_ = await OwnedContent.findOne({
                         attributes: ['User_id'],
                         where: {
@@ -152,7 +145,7 @@ router.post('', verifyToken, async (req, res, next) => {
                             own: 1,
                         },
                     });
-                    var sellerUserId = sellerUserId_.User_id;
+                    let sellerUserId = sellerUserId_.User_id;
 
                     const sellerCoin_ = await User.findOne({
                         attributes: ['coin'],
@@ -160,7 +153,7 @@ router.post('', verifyToken, async (req, res, next) => {
                             id: sellerUserId,
                         },
                     });
-                    var sellerCoin = sellerCoin_.coin;
+                    let sellerCoin = sellerCoin_.coin;
 
                     await User.update(
                         { coin: sellerCoin + i.price },
@@ -171,7 +164,6 @@ router.post('', verifyToken, async (req, res, next) => {
                             },
                         }
                     );
-                    ///////////////////////////////////////////
                 } else {
                     continue;
                 }

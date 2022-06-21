@@ -2,11 +2,8 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 const uuid4 = require('uuid4');
 const { verifyToken } = require('./middlewares');
-const formidable = require('express-formidable');
-const mv = require('mv');
 const AWS = require('aws-sdk');
 require('dotenv').config();
 const s3 = new AWS.S3({
@@ -15,9 +12,6 @@ const s3 = new AWS.S3({
     region: 'ap-northeast-2',
 });
 const multerS3 = require('multer-s3');
-
-const EC2_DNS = process.env.EC2_DNS;
-
 const {
     User,
     Novel,
@@ -26,10 +20,8 @@ const {
     OwnedContent,
     sequelize,
     Music,
-    Report,
 } = require('../models');
 
-// multer middleware for s3
 const uploadPath = (uploadpath) => {
     return multer({
         storage: multerS3({
@@ -45,11 +37,9 @@ const uploadPath = (uploadpath) => {
     });
 };
 
-// 챕터 내용 파일 생성 및 챕터 추가
 router.post('/chapter', verifyToken, async (req, res, next) => {
     const { title, novelId, price, content } = req.body;
     const userId = req.body.userId;
-    // console.log('content :', content);
     let chapterId = 0,
         current_chapterNumber = 0;
 
@@ -68,7 +58,6 @@ router.post('/chapter', verifyToken, async (req, res, next) => {
                 throw err;
             }
         });
-        console.log(`chapter uploaded. chapterFileName:${chapterFileName}`);
         const chapter = await Chapter.create({
             Novel_id: novelId,
             title,
@@ -112,13 +101,9 @@ router.post('/chapter', verifyToken, async (req, res, next) => {
     res.end();
 });
 
-// 소설 업로드
 router.post('/novel', verifyToken, async (req, res, next) => {
     const { title, description, genre, defaultPrice, coverImage } = req.body;
     const userId = req.body.userId;
-
-    // console.log(`title:${title} description:${description} genre:${genre} \
-    //     defaultPrice:${defaultPrice} coverImage:${coverImage}`);
     const temp = JSON.parse(coverImage).src;
 
     try {
@@ -154,7 +139,6 @@ router.post('/novel', verifyToken, async (req, res, next) => {
     }
 });
 
-// 이미지 저장 후 url 리턴
 router.post(
     '/img',
     uploadPath('illusts').single('image'),
@@ -165,7 +149,6 @@ router.post(
     }
 );
 
-// 챕터에 삽입된 일러스트 위치데이터 db에 저장
 router.post('/illust', verifyToken, async (req, res, next) => {
     const { novelId, chapterId, imgURLs, price } = req.body;
     const userId = req.body.userId;
@@ -182,7 +165,6 @@ router.post('/illust', verifyToken, async (req, res, next) => {
             order: [['set', 'DESC']],
             raw: true,
         });
-        // console.log('last set :', last_set);
         current_set_number = last_set ? await last_set.set : 0;
     } catch (err) {
         console.error(err);
@@ -200,7 +182,6 @@ router.post('/illust', verifyToken, async (req, res, next) => {
         imgURLs.map(async (imgURL) => {
             try {
                 const { url, index } = imgURL;
-                // console.log(`illust url : ${url}, index : ${index}`);
                 await Illust.create({
                     Chapter_id: chapterId,
                     Chapter_Novel_id: novelId,
@@ -229,7 +210,6 @@ router.post('/illust', verifyToken, async (req, res, next) => {
     res.end();
 });
 
-//음악 파일 업로드
 router.post(
     '/music',
     uploadPath('music').single('musicFile'),
@@ -288,7 +268,6 @@ router.post(
     }
 );
 
-//사용자가 해당 챕터에 대해 구매한 음악의 목록 응답 (연수 테스트ok)
 router.get('/purchased/music/:novelId/:chapterId', async (req, res, next) => {
     const novelId = req.params.novelId;
     const chapterId = req.params.chapterId;
@@ -309,7 +288,6 @@ router.get('/purchased/music/:novelId/:chapterId', async (req, res, next) => {
     }
 });
 
-//해당 챕터에 대한 음악 중 사용자가 구매하지 않은 목록을 리턴(연수  테스트 ok)
 router.get('/list/music/:novelId/:chapterId', async (req, res, next) => {
     const novelId = req.params.novelId;
     const chapterId = req.params.chapterId;
