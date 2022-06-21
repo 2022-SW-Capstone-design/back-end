@@ -1,4 +1,3 @@
-
 const express = require('express');
 const path = require('path');
 const morgan = require('morgan');
@@ -11,14 +10,15 @@ const helmet = require('helmet');
 
 dotenv.config();
 const { sequelize } = require('./models');
-sequelize.sync({ force: false }) // true 시 DROP TABLE IF EXISTS 작동
+sequelize
+    .sync({ force: false }) // true 시 DROP TABLE IF EXISTS 작동
     .then(() => {
         console.log('데이터베이스 연결 성공');
-    }) 
+    })
     .catch((err) => {
         console.error(err);
-    }); 
-    
+    });
+
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
 const uploadRouter = require('./routes/upload');
@@ -27,12 +27,9 @@ const reportRouter = require('./routes/report');
 const likeRouter = require('./routes/like');
 const purchasingRouter = require('./routes/purchasing');
 
-
 const app = express();
 app.set('port', process.env.PORT || 8081);
 passportConfig();
-
- 
 
 if (process.env.NODE_ENV == 'production') {
     app.use(morgan('combined'));
@@ -50,7 +47,7 @@ app.use('/illust', express.static(path.join(__dirname, '/uploads/illusts')));
 app.use('/music', express.static(path.join(__dirname, '/uploads/music')));
 // app.use(formidable()); //postman error
 app.use(passport.initialize());
- 
+
 // router 핸들링
 app.use('/', indexRouter);
 app.use('/auth', authRouter);

@@ -18,18 +18,16 @@ router.post('/user', verifyToken, async (req, res, next) => {
             Chapter_Novel_id: novelId,
             userId: userId,
             content: content,
-            rating: rating
-        })
+            rating: rating,
+        });
     } catch (err) {
         console.error(err);
         next(err);
     }
     res.end();
-})
-
+});
 
 router.post('/critic', verifyToken, async (req, res, next) => {
-
     var novelId = req.body.novelId;
     var rating = req.body.rating;
     var content = req.body.content;
@@ -40,9 +38,9 @@ router.post('/critic', verifyToken, async (req, res, next) => {
         var nickname = await User.findOne({
             attributes: ['nickname'],
             where: {
-                id: userId
-            }
-        })
+                id: userId,
+            },
+        });
 
         await CriticComment.create({
             Novel_id: novelId,
@@ -50,65 +48,63 @@ router.post('/critic', verifyToken, async (req, res, next) => {
             nickname: nickname.nickname,
             content: content,
             rating: rating,
-            likes: 0
-        })
-
+            likes: 0,
+        });
     } catch (err) {
         console.error(err);
         next(err);
     }
     res.end();
-})
+});
 
-router.get('/user/:novelId/:chapterId',  async (req, res, next) => {
-    
+router.get('/user/:novelId/:chapterId', async (req, res, next) => {
     if (req.query.page == undefined) {
-        var page = 1
+        var page = 1;
     } else {
         var page = Number(req.query.page);
     }
 
     if (req.query.each == undefined) {
-        var each = 10
+        var each = 10;
     } else {
         var each = Number(req.query.each);
     }
 
     if (req.query.sorted == 'old') {
-        var sorted = 'asc'
+        var sorted = 'asc';
     } else if (req.query.sorted == 'new') {
-        var sorted = 'desc'
+        var sorted = 'desc';
     } else if (req.query.sorted == undefined) {
-        var sorted = 'desc'
+        var sorted = 'desc';
     }
 
     try {
         var comment = await UserComment.findAll({
             where: {
                 Chapter_Novel_id: req.params.novelId,
-                Chapter_id: req.params.chapterId
+                Chapter_id: req.params.chapterId,
             },
             order: [['id', sorted]],
             limit: each,
-            offset: each * (page - 1)
-        })
+            offset: each * (page - 1),
+        });
     } catch (err) {
         console.error(err);
         next(err);
     }
     res.send(comment);
-})
+});
 
 router.get('/critic/:novelId', async (req, res, next) => {
     var page = Number(req.query.page);
     var each = Number(req.query.each);
 
     if (req.query.sorted == 'old') {
-        var sorted = 'asc'
+        var sorted = 'asc';
     } else if (req.query.sorted == 'new') {
-        var sorted = 'desc'
+        var sorted = 'desc';
     } else if (req.query.sorted == undefined) {
-        var sorted = 'desc'
+        var sorted = 'desc';
     }
 
     try {
@@ -118,12 +114,12 @@ router.get('/critic/:novelId', async (req, res, next) => {
             },
             order: [['id', sorted]],
             limit: each,
-            offset: each * (page - 1)
-        })
+            offset: each * (page - 1),
+        });
     } catch (err) {
         console.error(err);
         next(err);
     }
     res.send(comment);
-})
+});
 module.exports = router;
